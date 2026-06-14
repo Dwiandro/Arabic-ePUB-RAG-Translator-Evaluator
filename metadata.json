@@ -1,0 +1,6 @@
+{
+  "name": "Arabic ePUB RAG Translator & Evaluator",
+  "description": "An academic Arabic literature analysis platform. It parses Arabic ePUB files, translates to Indonesian, provides interactive RAG Q&A via local transformers.js embeddings and Gemini 3.5, and evaluates translation, summarization, and RAG quality using BLEU, ROUGE-L, and Semantic Similarity.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

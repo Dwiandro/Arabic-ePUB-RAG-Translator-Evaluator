@@ -1,0 +1,47 @@
+[
+  {
+    "id": 1,
+    "category": "Filsafat & Hikmah",
+    "original_arabic": "العِلْمُ بِلَا عَمَلٍ كَالشَّجَرِ بِلَا ثَمَرٍ. وَمَنْ لَمْ يَصْبِرْ عَلَى ذُلِّ التَّعَلُّمِ سَاعَةً، بَقِيَ فِي ذُلِّ الجَهْلِ أَبَدًا.",
+    "referensi_translasi": "Ilmu tanpa amal bagaikan pohon tanpa buah. Dan barangsiapa yang tidak bersabar menanggung hinanya belajar barang sesaat, maka ia akan tetap berada dalam kehinaan kebodohan selamanya.",
+    "referensi_ringkasan": "Pentingnya menuntut ilmu dan mengamalkannya, serta kewajiban bersabar dalam proses belajar agar terhindar dari kebodohan abadi.",
+    "pertanyaan": "Apa perumpamaan ilmu yang tidak diamalkan menurut teks tersebut?",
+    "referensi_jawaban": "Menurut teks tersebut, ilmu yang tidak diamalkan bagaikan pohon yang tidak berbuah."
+  },
+  {
+    "id": 2,
+    "category": "Sastra Klasik",
+    "original_arabic": "إِنَّ الحَيَاءَ مِنَ الإِيمَانِ، وَهُوَ زِينَةُ النَّفْسِ البَشَرِيَّةِ. فَمَنْ فَقَدَ الحَيَاءَ، جَرَّدَ نَفْسَهُ مِنْ كُلِّ خَيْرٍ وَجَعَلَهَا عُرْضَةً لِكُلِّ ذَنْبٍ.",
+    "referensi_translasi": "Sesungguhnya rasa malu adalah bagian dari iman, dan ia merupakan hiasan bagi jiwa manusia. Maka barangsiapa yang kehilangan rasa malu, ia telah menelanjangi dirinya dari segala kebaikan dan menjadikannya rentan terhadap setiap dosa.",
+    "referensi_ringkasan": "Rasa malu sebagai bagian iman dan pelindung jiwa yang mencegah manusia dari segala bentuk perbuatan dosa.",
+    "pertanyaan": "Mengapa rasa malu dianggap penting dalam teks tersebut?",
+    "referensi_jawaban": "Rasa malu dianggap penting karena merupakan bagian dari iman dan hiasan bagi jiwa manusia, serta mencegah manusia dari kehilangan kebaikan dan terjerumus ke dalam dosa."
+  },
+  {
+    "id": 3,
+    "category": "Etika & Sosial",
+    "original_arabic": "الصِّدْقُ مُنْجٍ وَالكِذْبُ مُهْلِكٌ. وَالصَّدِيقُ الصَّدُوقُ هُوَ الَّذِي يَقِفُ مَعَكَ فِي الضَّرَّاءِ قَبْلَ السَّرَّاءِ، وَيَنْصَحُكَ بِالحَقِّ لَا بِمَا تُحِبُّ.",
+    "referensi_translasi": "Kejujuran itu menyelamatkan dan dusta itu membinasakan. Dan sahabat sejati adalah dia yang berdiri bersamamu di kala sulit sebelum kala senang, dan menasihatimu dengan kebenaran bukan dengan apa yang kamu sukai.",
+    "referensi_ringkasan": "Kejujuran menyelamatkan jiwa sedangkan kebohongan menghancurkannya. Sahabat sejati menasihati kebenaran di kala suka maupun duka.",
+    "pertanyaan": "Bagaimana karakteristik sahabat sejati menurut teks tersebut?",
+    "referensi_jawaban": "Karakteristik sahabat sejati adalah orang yang selalu ada mendampingi di kala sulit sebelum di kala senang, serta memberikan nasihat berdasarkan kebenaran, bukan sekadar apa yang disukai temannya."
+  },
+  {
+    "id": 4,
+    "category": "Ketabahan Jiwa",
+    "original_arabic": "الصَّبْرُ مِفْتَاحُ الفَرَجِ، وَعِنْدَ الضِّيقِ تَتَّسِعُ رَحْمَةُ اللهِ. فَلَا تَحْزَنْ إِذَا ضَاقَتْ بِكَ الأَسْبَابُ، فَإِنَّ خَالِقَ الأَسْبَابِ يَفْتَحُ لَكَ أَبْوَابًا لَمْ تَكُنْ تَحْتَسِبُهَا.",
+    "referensi_translasi": "Sabar adalah kunci jalan keluar, dan di kala kesempitan, rahmat Allah justru meluas. Maka janganlah bersedih jika segala sebab terasa sempit bagimu, karena Pencipta sebab akan membukakan pintu-pintu yang tidak berselisih dalam perkiraanmu.",
+    "referensi_ringkasan": "Kesabaran adalah kunci kemudahan dan pembuka pintu-pintu rahmat Tuhan yang tak terduga saat menghadapi kesulitan hidup.",
+    "pertanyaan": "Apa yang disarankan teks saat kita menghadapi kesempitan hidup?",
+    "referensi_jawaban": "Teks menyarankan kita untuk bersabar dan tidak bersedih saat menghadapi hal sulit, karena Pencipta sebab akan membukakan jalan keluar dan pintu kemudahan yang tidak terduga."
+  },
+  {
+    "id": 5,
+    "category": "Nilai Kehidupan",
+    "original_arabic": "الوَقْتُ كَالسَّيْفِ إِنْ لَمْ تَقْطَعْهُ قَطَعَكَ. وَالعُمُرُ أَنْفَاسٌ لَا تَعُودُ، فَكُلُّ يَوْمٍ يَمْضِي مِنْكَ يُقَرِّبُكَ إِلَى القَبْرِ خُطْوَةً، فَاغْتَنِمْ شَبَابَكَ قَبْلَ هَرَمِكَ.",
+    "referensi_translasi": "Waktu bagaikan pedang, jika kamu tidak memotongnya maka dialah yang akan memotongmu. Dan umur adalah rangkaian napas yang tidak akan kembali, maka setiap hari yang berlalu darimu mendekatkanmu seangkah ke kubur, maka manfaatkanlah masa mudamu sebelum masa tuamu.",
+    "referensi_ringkasan": "Pentingnya menghargai waktu yang terus berjalan lurus, memanfaatkan usia muda dengan bijak sebelum datangnya masa tua.",
+    "pertanyaan": "Apa arti perumpamaan waktu adalah pedang dalam teks tersebut?",
+    "referensi_jawaban": "Perumpamaan tersebut berarti jika kita tidak mampu mengelola dan memanfaatkan waktu dengan baik, maka waktu itu sendiri yang akan merugikan dan menghancurkan hidup kita."
+  }
+]
