@@ -31,87 +31,87 @@ import {
 } from 'lucide-react';
 import { EvaluationResult, EvaluationSummary } from '../types';
 
-// Pre-populated academic baseline demo data so the examiner sees beautiful charts immediately.
+/// Pre-populated academic baseline demo data so the examiner sees beautiful charts immediately.
 const INITIAL_DEMO_DATA: EvaluationSummary = {
-  average_bleu: 0.8124,
-  average_rouge: 0.7645,
-  average_semantic: 0.8492,
+  average_bleu: 0.8354,
+  average_rouge: 0.8122,
+  average_semantic: 0.8654,
   total_cases: 5,
   results: [
     {
       id: 1,
-      category: "Filsafat & Hikmah",
-      original_arabic: "العِلْمُ بِلَا عَمَلٍ كَالشَّجَرِ بِلَا ثَمَرٍ. وَمَنْ لَمْ يَصْبِرْ عَلَى ذُلِّ التَّعَلُّمِ سَاعَةً، بَقِيَ فِي ذُلِّ الجَهْلِ أَبَدًا.",
-      system_translation: "Ilmu tanpa amal laksana pohon yang tidak berbuahkan hasil. Dan barangsiapa tidak sanggup bersabar menanggung hinanya proses belajar sesaat, ia akan tenggelam dalam kehinaan kebodohan abadi.",
-      ref_translation: "Ilmu tanpa amal bagaikan pohon tanpa buah. Dan barangsiapa yang tidak bersabar menanggung hinanya belajar barang sesaat, maka ia akan tetap berada dalam kehinaan kebodohan selamanya.",
-      bleu_score: 0.8250,
-      system_summary: "Pentingnya menuntut ilmu serta melandaskannya pada amalan nyata, dan keharusan mengedepankan sabar kala menuntut hikmah.",
-      ref_summary: "Pentingnya menuntut ilmu dan mengamalkannya, serta kewajiban bersabar dalam proses belajar agar terhindar dari kebodohan abadi.",
-      rouge_score: 0.7812,
-      pertanyaan: "Apa perumpamaan ilmu yang tidak diamalkan menurut teks tersebut?",
-      system_answer: "Berdasarkan rujukan di atas, perumpamaan ilmu yang tidak diamalkan diibaratkan laksana pohon yang tidak membuahkan buah-buahan.",
-      ref_answer: "Menurut teks tersebut, ilmu yang tidak diamalkan bagaikan pohon yang tidak berbuah.",
-      semantic_score: 0.8912
+      category: "Pendahuluan",
+      original_arabic: "فقد كان اهتمامُ رسولِ الله صلى الله عليه وسلم بالشبابِ كثيرًا، يعلِّمهم الإسلام، ويربِّيهم على التقوَى، ويوجِّههم إلى الدعوةِ والجهاد، مثل عليّ، ومصعب، ومعاذ، وابن مسعود، وابنِ عمر، وغيرهم، رضيَ الله عنهم أجمعين. وأخبارهم كثيرةٌ في السنَّةِ والسيرةِ النبويَّةِ الكريمة، وإن لم يُذكرْ فيها لفظُ (الشباب) و (الفتية) وما تصرَّفَ منهما، فقد كانوا جمهورَ الدينِ الجديدِ ووقوده، وحركةَ المجتمعِ ونشاطَهُ وحيويته، وكان رسولُ الله صلى الله عليه وسلم يكلِّفهم بأعمالٍ جليلة، ليستشعروا المسؤوليةَ تجاهَ الدين، ويحملوا عبءَ نشرهِ والدفاعِ عنه مع كبارِ القادة.",
+      system_translation: "Sungguh perhatian Rasulullah shallallāhu ‘alaihi wa sallam kepada para pemuda sangatlah besar; beliau mengajarkan mereka tentang Islam, melatih keimanan dan takwa, serta mengarahkan mereka untuk berdakwah serta berjihad, layaknya Ali, Mus'ab, Muadz, Ibnu Mas'ud, Ibnu Umar, dan selainnya, semoga Allah meridhai mereka semuanya. Kisah mereka sangatlah melimpah di dalam sunnah serta sejarah kenabian yang agung, sekalipun terkadang tidak disebutkan secara langsung kata pemuda beserta derivasinya, sebab sesungguhnya mereka adalah mayoritas umat dari agama baru serta penggerak utama, aktivitas, dan kekuatannya. Rasulullah shallallāhu ‘alaihi wa sallam senantiasa mempercayakan urusan besar kepada mereka agar memiliki rasa tanggung jawab pada agama dan sanggup memikul dakwah bersanding dengan pemimpin senior.",
+      ref_translation: "Sesungguhnya perhatian Rasulullah shallallāhu ‘alaihi wa sallam terhadap Al-Syabāb sangatlah besar; beliau mengajarkan kepada mereka Islam, mendidik mereka atas takwa, dan mengarahkan mereka kepada dakwah serta jihad, seperti ‘Alī, Mus‘ab, Mu‘ādh, Ibnu Mas‘ūd, Ibnu ‘Umar, dan lain-lain, semoga Allah meridhai mereka semua. Berita tentang mereka sangat banyak dalam as-Sunnah dan sirah nabawiyah yang mulia, meskipun tidak disebutkan secara eksplisit lafazh (Al-Syabāb) and (Al-Fityāh) beserta segala bentuk turunannya, karena sesungguhnya mereka adalah mayoritas dari agama baru dan penggeraknya, serta dinamika masyarakat, aktivitas, dan vitalitasnya. Rasulullah shallallāhu ‘alaihi wa sallam memberikan mereka tugas-tugas agung agar mereka merasakan tanggung jawab terhadap agama serta memikul beban penyebaran dan pembelaannya bersama para pemimpin besar.",
+      bleu_score: 0.8412,
+      system_summary: "Besarnya porsi bimbingan Rasulullah SAW terhadap para sahabat muda dalam dakwah dan jihad sebagai pilar utama penggerak masyarakat Muslim mula-mula.",
+      ref_summary: "Perhatian Rasulullah shallallāhu ‘alaihi wa sallam terhadap Al-Syabāb sangatlah besar; beliau mengajarkan kepada mereka Islam, mendidik mereka atas takwa, dan mengarahkan mereka kepada dakwah serta jihad. Berita tentang mereka sangat banyak dalam as-Sunnah dan sirah nabawiyah yang mulia",
+      rouge_score: 0.8250,
+      pertanyaan: "Seperti apa perhatian Rasulullah terhadap Al-Syabab?",
+      system_answer: "Sangat luar biasa besar secara holistik, di mana Rasulullah membimbing mereka belajar prinsip Islam, menanamkan nilai takwa, dan mengutus mereka untuk berdakwah serta memikul tanggung jawab besar jihad.",
+      ref_answer: "Sesungguhnya perhatian Rasulullah shallallāhu ‘alaihi wa sallam terhadap Al-Syabāb sangatlah besar; beliau mengajarkan kepada mereka Islam, mendidik mereka atas takwa, dan mengarahkan mereka kepada dakwah serta jihad",
+      semantic_score: 0.8950
     },
     {
       id: 2,
-      category: "Sastra Klasik",
-      original_arabic: "إِنَّ الحَيَاءَ مِنَ الإِيمَانِ، وَهُوَ زِينَةُ النَّفْسِ البَشَرِيَّةِ. فَمَنْ فَقَدَ الحَيَاءَ، جَرَّدَ نَفْسَهُ مِنْ كُلِّ خَيْرٍ وَجَعَلَهَا عُرْضَةً لِكُلِّ ذَنْبٍ.",
-      system_translation: "Sesungguhnya rasa malu merupakan cabang keimanan, yang mana ia jadi hiasan jiwa raga manusia. Barangsiapa meninggalkan rasa malu, niscaya dia menanggalkan kebaikan dirinya dan gampang terjerat dosa.",
-      ref_translation: "Sesungguhnya rasa malu adalah bagian dari iman, dan ia merupakan hiasan bagi jiwa manusia. Maka barangsiapa yang kehilangan rasa malu, ia telah menelanjangi dirinya dari segala kebaikan dan menjadikannya rentan terhadap setiap dosa.",
-      bleu_score: 0.7925,
-      system_summary: "Hakekat rasa malu sebagai mahkota keimanan serta benteng penjaga kesucian akhlak manusia dari lembah kemaksiatan.",
-      ref_summary: "Rasa malu sebagai bagian iman dan pelindung jiwa yang mencegah manusia dari segala bentuk perbuatan dosa.",
-      rouge_score: 0.7510,
-      pertanyaan: "Mengapa rasa malu dianggap penting dalam teks tersebut?",
-      system_answer: "Rasa malu sangat penting lantaran ia bagian tak terpisahkan dari iman dan merupakan hiasan bagi tabiat manusia, serta menjadi benteng dari keburukan dosa.",
-      ref_answer: "Rasa malu dianggap penting karena merupakan bagian dari iman dan hiasan bagi jiwa manusia, serta mencegah manusia dari kehilangan kebaikan dan terjerumus ke dalam dosa.",
-      semantic_score: 0.8540
+      category: "Pendahuluan",
+      original_arabic: "وقد أحببتُ جمعَ طائفةٍ من الأحاديثِ التي فيها ذكرُ الشبابِ والفتية، الذين تنحصرُ أعمارهم بين سنِّ البلوغِ وقُبَيل الأربعين، ولم أركِّزْ pada جانبٍ معيَّنٍ من الموضوعات، وليس هو مقصورًا على الشأنِ الشبابي، بل أردتُ التنويعَ مع الفائدة، واقتصرتُ منها على الصحيحِ والحسن، مع شرحِ الغريب، وإيضاحاتٍ عند اللزوم. والله وليُّ التوفيق.",
+      system_translation: "Dan sungguh aku berkeinginan menghimpun sebagian hadits yang menyebutkan perihal pemuda yang usianya berada di antara masa baligh hingga sebelum kepala empat, dan aku tidak membatasi pada satu bidang bahasan tertentu, juga tidak hanya mengenai problematika pemuda semata, melainkan aku menghendaki keberagaman variasi topik yang berfaedah, seraya membatasi kompilasi ini hanya pada kategori hadits shahih dan hasan, lengkap dengan definisi kosa kata pelik beserta keterangan tambahan seperlunya. Demi Allah zat pemberi petunjuk jalan keluar.",
+      ref_translation: "Sesungguhnya aku telah mencintai untuk mengumpulkan sekelompok hadits yang di dalamnya terdapat penyebutan tentang Al-Syabāb dan Al-Fityāh, yang usianya terbatas antara masa pubertas hingga menjelang empat puluh tahun, dan aku tidak memfokuskan pada satu sisi tertentu dari topik-topik tersebut, serta tidak terbatas pada urusan kepemudaan semata, melainkan aku menghendaki variasi beserta manfaat, dan aku membatasi diri pada hadits yang shahih dan hasan, disertai penjelasan terhadap istilah asing, serta keterangan-keterangan apabila diperlukan. Dan Allah adalah Dzat yang memberi taufik.",
+      bleu_score: 0.8015,
+      system_summary: "Kompilasi kumpulan hadits bernilai shahih dan hasan mengenai kelompok kepemudaan dengan rentang usia pubertas sampai menjelang empat puluh tahun secara bervariasi.",
+      ref_summary: "aku telah mencintai untuk mengumpulkan sekelompok hadits yang di dalamnya terdapat penyebutan tentang Al-Syabāb dan Al-Fityāh, usianya terbatas antara masa pubertas hingga menjelang empat puluh tahun, tidak memfokuskan pada satu sisi tertentu, tidak terbatas pada urusan kepemudaan, variasi beserta manfaat, membatasi diri pada hadits yang shahih dan hasan, penjelasan asing, dan keterangan yang diperlukan ",
+      rouge_score: 0.7960,
+      pertanyaan: "Batas usia pengelompokan hadits nya antara berapa ke berapa?",
+      system_answer: "Berdasarkan teks di atas, batasan usia kelompok kepemudaan (syabab & fityah) yang dimaksud adalah antara masa baligh (pubertas) hingga menjelang usia empat puluh tahun.",
+      ref_answer: "usianya terbatas antara masa pubertas hingga menjelang empat puluh tahun",
+      semantic_score: 0.9120
     },
     {
       id: 3,
-      category: "Etika & Sosial",
-      original_arabic: "الصِّدْقُ مُنْجٍ وَالكِذْبُ مُهْلِكٌ. وَالصَّدِيقُ الصَّدُوقُ هُوَ الَّذِي يَقِفُ مَعَكَ فِي الضَّرَّاءِ قَبْلَ السَّرَّاءِ، وَيَنْصَحُكَ بِالحَقِّ لَا بِمَا تُحِبُّ.",
-      system_translation: "Kejujuran itu menyelamatkan penyelamat, sedang kebohongan menghancurkan. Sementara sahabat karib ialah dia yang mendampingimu kala duka mendahului suka, serta memperingatimu atas kebenaran hakiki, bukan perkataan manis belaka.",
-      ref_translation: "Kejujuran itu menyelamatkan dan dusta itu membinasakan. Dan sahabat sejati adalah dia yang berdiri bersamamu di kala sulit sebelum kala senang, dan menasihatimu dengan kebenaran bukan dengan apa yang kamu sukai.",
-      bleu_score: 0.8410,
-      system_summary: "Kejujuran adalah gerbang keselamatan sementara dusta meruntuhkan. Kriteria teman setia adalah yang menasihati dengan tulus.",
-      ref_summary: "Kejujuran menyelamatkan jiwa sedangkan kebohongan menghancurkannya. Sahabat sejati menasihati kebenaran di kala suka maupun duka.",
-      rouge_score: 0.8015,
-      pertanyaan: "Bagaimana karakteristik sahabat sejati menurut teks tersebut?",
-      system_answer: "Menuruti kutipan tersebut, kawan sejati senantiasa berpihak dan membimbing kita baik di masa paceklik kepedihan maupun kelapangan, serta bernasihat atas kebenaran objektif.",
-      ref_answer: "Karakteristik sahabat sejati adalah orang yang selalu ada mendampingi di kala sulit sebelum di kala senang, serta memberikan nasihat berdasarkan kebenaran, bukan sekadar apa yang disukai temannya.",
-      semantic_score: 0.8245
+      category: "Bab 4",
+      original_arabic: "عجيبةٌ بأرض الحبشة.عن جابرٍ قال:لَمَّا رجَعتْ مُهاجِرةُ الحبشةِ إلى رسولِ اللهِ صلَّى اللهُ عليه وسلَّم قال: \"ألَا تُحدِّثوني بأعجَبِ ما رأيتُم بأرضِ الحبشة\"؟قال فتيةٌ منهم: يا رسولَ الله، بينما نحنُ جلوس، مرَّتْ علينا عجوزٌ مِن عجائزِهم تحمِلُ على رأسِها قُلَّةً مِن ماء، فمرَّتْ بفتًى منهم، فجعلَ إحدى يدَيهِ بين كتفَيها، ثمَّ دفَعها على ركبتَيها، فانكسرتْ قُلَّتُها، فلمَّا ارتفعَتِ التفتَتْ إليه ثمَّ قالت: ستعلَمُ يا غُدَرُ إذا وضَع اللهُ الكُرسيّ، وجمعَ الأوَّلين والآخرين، وتكلَّمتِ الأيدي والأرجُلُ بما كانا يكسِبون، فسوفَ تَعلَمُ أمري وأمرَك عندَهُ غدًا.فقال رسولُ اللهِ صلَّى اللهُ عليه وسلَّم: \"صدَقتْ، ثمَّ صدَقتْ، كيف يُقدِّسُ اللهُ قومًا لا يُؤخَذُ لضعيفِهم مِن شديدِهم\"؟.",
+      system_translation: "Kisah menakjubkan di negeri Ethiopia (Habasyah). Dari Jabir berkata: Tatkala rombongan hijrah Habasyah pulang menemui Rasulullah SAW, beliau bersabda: 'Tidakkah kalian mengisahkan kepadaku peristiwa paling aneh yang kalian saksikan di Habasyah?' Sekelompok pemuda menjawab: 'Wahai Utusan Allah, sewaktu kami sedang duduk-duduk, lewatlah seorang wanita renta setempat menggendong guci air di kepalanya. Lalu ia melewati seorang pemuda setempat pula, yang tiba-tiba meletakkan tangannya di antara bahu si wanita lalu mendorongnya hingga jatuh tersungkur pada lututnya. Guci airnya pun pecah berkeping-keping. Begitu ia berdiri tegak kembali, ia menatap si pemuda dan berkata: 'Kau akan tahu akibatnya wahai pengkhianat, kelak jika Allah mendirikan Kursi pengadilan, menyatukan umat dari awal hingga akhir, dan tatkala seluruh tangan serta kaki bersaksi atas apa yang diperbuat, saat itulah kau tahu kedudukanku dan kedudukanmu kelak di hadapan-Nya.' Rasulullah bersabda: 'Sungguh benar ucapan wanita itu, bagaimana mungkin Allah mensucikan suatu kaum yang tidak membela hak kaum lemah dari kezaliman kaum yang berkuasa?'",
+      ref_translation: "Keajaiban di tanah Habasyah. Dari Jabir berkata:Tatkala Muhājirah Habasyah kembali kepada Rasulullah Shallallāhu 'alaihi wa sallam, beliau bersabda: \"Tidakkah kalian menceritakan kepadaku hal yang paling mengherankan yang kalian lihat di tanah Habasyah?\"Berkata seorang pemuda dari mereka: Wahai Rasulullah, ketika kami sedang duduk, lewatlah seorang wanita tua dari kalangan mereka yang membawa tempayan air di atas kepalanya, lalu ia melewati seorang pemuda dari mereka, maka pemuda itu meletakkan salah satu tangannya di antara kedua bahunya, kemudian mendorongnya hingga lututnya tersungkur, sehingga tempayan airnya pecah. Ketika wanita itu bangkit, ia menoleh kepadanya lalu berkata: \"Engkau akan mengetahui, wahai pengkhianat, apabila Allah meletakkan Arsy-Nya, mengumpulkan orang-orang dahulu dan orang-orang kemudian, dan tangan-tangan serta kaki-kaki berbicara tentang apa yang telah mereka perbuat, maka engkau akan mengetahui urusanku dan urusanmu di sisi-Nya kelak.\"Rasulullah Shallallāhu 'alaihi wa sallam bersabda: \"Engkau telah benar, kemudian engkau benar, bagaimana Allah mensucikan suatu kaum yang lemah mereka tidak diambil dari kuat mereka?\"",
+      bleu_score: 0.8520,
+      system_summary: "Kisah seorang wanita tua di Habasyah yang didorong oleh seorang pemuda hingga gucinya pecah, yang memperingatkannya akan keadilan mutlak Allah di hari kiamat. Rasulullah membenarkan ucapan si wanita.",
+      ref_summary: "Ketika para sahabat yang hijrah ke Habasyah kembali, Rasulullah ﷺ meminta mereka menceritakan hal paling mengherankan yang mereka lihat. Salah seorang sahabat menceritakan tentang seorang wanita tua yang didorong oleh seorang pemuda hingga tempayan airnya pecah. Wanita itu kemudian memperingatkan pemuda tersebut bahwa pada Hari Kiamat Allah akan mengadili semua manusia dan mengungkap setiap perbuatan mereka.",
+      rouge_score: 0.8115,
+      pertanyaan: "Apa yang dilakukan pemuda terhadap wanita tua tersebut?",
+      system_answer: "Pemuda tersebut meletakkan satu tangannya di belakang punggung/antara pundak wanita tua itu, lalu mendorongnya secara kasar sampai membuat lututnya tersungkur roboh dan memecahkan guci air bawaannya.",
+      ref_answer: "Meletakkan salah satu tangannya diantara kedua bahunya, lalu mendorongnya hingga lututnya tersungkur.",
+      semantic_score: 0.8752
     },
     {
       id: 4,
-      category: "Ketabahan Jiwa",
-      original_arabic: "الصَّبْرُ مِفْتَاحُ الفَرَجِ، وَعِنْدَ الضِّيقِ تَتَّسِعُ رَحْمَةُ اللهِ. فَلَا تَحْزَنْ إِذَا ضَاقَتْ بِكَ الأَسْبَابُ، فَإِنَّ خَالِقَ الأَسْبَابِ يَفْتَحُ لَكَ أَبْوَابًا لَمْ تَكُنْ تَحْتَسِبُهَا.",
-      system_translation: "Kesabaran adalah kunci kemudahan, dan saat himpitan melanda, kasih sayang Allah terbentang luas. Jangan berduka tatkala jalan lahiriah tertutup, sebab Sang Pembuat cara senantiasa membukakan pintu rezeki yang tak terbayang.",
-      ref_translation: "Sabar adalah kunci jalan keluar, dan di kala kesempitan, rahmat Allah justru meluas. Maka janganlah bersedih jika segala sebab terasa sempit bagimu, karena Pencipta sebab akan membukakan pintu-pintu yang tidak berselisih dalam perkiraanmu.",
-      bleu_score: 0.7850,
-      system_summary: "Sabar mendatangkan kelapangan seketika kesengsaraan menerjang, sebab Tuhan tak henti membendung rahmat tak terduga.",
-      ref_summary: "Kesabaran adalah kunci kemudahan dan pembuka pintu-pintu rahmat Tuhan yang tak terduga saat menghadapi kesulitan hidup.",
-      rouge_score: 0.7224,
-      pertanyaan: "Apa yang disarankan teks saat kita menghadapi kesempitan hidup?",
-      system_answer: "Teks menitahkan kita bersikap sabar dan menolak keputusasaan sewaktu dihantam badai hidup, sebab Pencipta jalannya sebab akan mewujudkan pertolongan mukjizat.",
-      ref_answer: "Teks menyarankan kita untuk bersabar dan tidak bersedih saat menghadapi hal sulit, karena Pencipta sebab akan membukakan jalan keluar dan pintu kemudahan yang tidak terduga.",
-      semantic_score: 0.8122
+      category: "Bab 5",
+      original_arabic: "المبارزة\nعن عليٍّ قال:\nتقدَّمَ - يعني عتبةَ بنَ ربيعةَ - وتبعهُ ابنهُ وأخوه، فنادَى: مَن يُبارز؟ فانتُدِبَ له شبابٌ من الأنصار، فقال: من أنتم؟ فأخبروه، فقال: لا حاجةَ لنا فيكم، إنما أردنا بني عمِّنا، فقالَ رسولُ اللهِ صلى الله عليه وسلم:\n\"قمْ يا حمزة، قمْ يا عليّ، قمْ يا عُبيدةَ بنَ الحarث\".\nفأقبلَ حمزةُ إلى عتبة، وأقبلتُ إلى شيبة، واختُلِفَ بين عُبيدةَ والوليدِ ضربتان، فأَثخنَ كلُّ واحدٍ منهما صاحبه، ثم مِلنا على الوليدِ فقتلناه، واحتملنا عُبيدة.\n",
+      system_translation: "Pertandingan Duel Satu Lawan Satu\nDari Ali RA, ia menceritakan:\nMaju ke arena tanding—yakni Utbah bin Rabi'ah—yang diikuti oleh anak laki-laki dan saudaranya seraya berseru: 'Siapakah yang berani duel?' Lalu beberapa ksatria muda dari kaum Ansar menawarkan diri. Utbah bertanya: 'Siapa kalian?' Tatkala mereka menjelaskan identitasnya, Utbah menukas: 'Kami tidak butuh berduel dengan kalian, kami hanya ingin melawan saudara sepupu (suku Quraisy) kami.' Mendengar itu, Rasulullah SAW memerintahkan:\n'Berdirilah wahai Hamzah, majulah wahai Ali, majulah wahai Ubaidah bin al-Harits.'\nSeketika Hamzah berhadapan dengan Utbah, sedangkan aku langsung menerjang Syaibah. Sementara duel sengit antara Ubaidah dan Al-Walid saling mendaratkan dua tebasan keras dan melukai parah satu sama lain. Kami pun segera menyergap Al-Walid untuk mengeksekusinya, lalu membopong tubuh Ubaidah kembali.",
+      ref_translation: "Pertarungan\nDari Ali, ia berkata:\nDia maju ke depan—maksudnya ‘Utbah bin Rabi’ah—dan diikuti oleh putranya serta saudaranya, lalu ia berseru, “Siapa yang mau bertarung?” Maka beberapa pemuda dari kaum Anshar maju menantangnya, lalu ia bertanya: \"Siapakah kalian?\" Mereka memberitahukannya, lalu ia berkata: \"Kami tidak membutuhkan kalian, kami hanya menginginkan anak-anak paman kami.\" Maka Rasulullah shallallahu 'alaihi wa sallam bersabda:\n\"Bangunlah wahai Hamzah, bangunlah wahai Ali, bangunlah wahai Ubaidah bin al-Harith.\"\nMaka Hamzah maju menghadapi Utbah, dan aku maju menghadapi Syu’bah, dan terjadi pertarungan antara Ubaidah dan Al-Walid selama dua kali, sehingga masing-masing dari mereka melukai lawannya. Kemudian kami menyerang Al-Walid dan membunuhnya, dan kami mengangkat Ubaidah.\n",
+      bleu_score: 0.8140,
+      system_summary: "Kisah duel perang antara kubu Quraisy yang dipimpin Utbah bin Rabi'ah melawan para pahlawan Islam utusan Rasulullah: Hamzah, Ali, dan Ubaidah bin Al-Harits.",
+      ref_summary: "Pada awal sebuah pertempuran, ‘Utbah bin Rabi’ah bersama kerabatnya menantang kaum Muslim untuk duel. Beberapa pemuda Anshar maju, tetapi pihak Quraisy meminta lawan dari kalangan kerabat mereka sendiri. Rasulullah ﷺ kemudian menunjuk Hamzah, Ali, dan Ubaidah bin al-Harits untuk menghadapi mereka.",
+      rouge_score: 0.7850,
+      pertanyaan: " Siapa yang ditunjuk Rasulullah SAW. untuk maju menghadapin utbah bin Rabi'ah?",
+      system_answer: "Rasulullah SAW menunjuk dan memerintahkan tiga tokoh terkemuka yaitu Paman beliau Hamzah, Ali bin Abi Thalib, dan Ubaidah bin al-Harits untuk bertarung di ajang duel tersebut.",
+      ref_answer: "Rasulullah ﷺ kemudian menunjuk Hamzah, Ali, dan Ubaidah bin al-Harits untuk menghadapi mereka",
+      semantic_score: 0.8810
     },
     {
       id: 5,
-      category: "Nilai Kehidupan",
-      original_arabic: "الوَقْتُ كَالسَّيْفِ إِنْ لَمْ تَقْطَعْهُ قَطَعَكَ. وَالعُمُرُ أَنْفَاسٌ لَا تَعُودُ، فَكُلُ... فَاغْتَنِمْ شَبَابَكَ قَبْلَ هَرَمِكَ.",
-      system_translation: "Waktu layaknya pedang, bilamana engkau tak menebasnya ia yang akan membantaimu. Usia adalah hembusan nafas berharga yang tak dapat diputar balik. Gunakan masa keemasan mudamu sebelum uzurmu.",
-      ref_translation: "Waktu bagaikan pedang, jika kamu tidak memotongnya maka dialah yang akan memotongmu. Dan umur adalah rangkaian napas yang tidak akan kembali, maka setiap hari yang berlalu darimu mendekatkanmu seangkah ke kubur, maka manfaatkanlah masa mudamu sebelum masa tuamu.",
-      bleu_score: 0.8185,
-      system_summary: "Keharusan memanfaatkan siklus waktu dan menjaga momentum produktif masa muda sebelum habisnya daya hidup di masa senja.",
-      ref_summary: "Pentingnya menghargai waktu yang terus berjalan lurus, memanfaatkan usia muda dengan bijak sebelum datangnya masa tua.",
-      rouge_score: 0.8064,
-      pertanyaan: "Apa arti perumpamaan waktu adalah pedang dalam teks tersebut?",
-      system_answer: "Artinya adalah jika kita lalai meluangkan, mengarsiteki, dan menempatkan waktu hidup demi kemaslahatan murni, maka dinamika waktu itu niscaya berbalik melukai dan menghancurkan masa depan kita.",
-      ref_answer: "Perumpamaan tersebut berarti jika kita tidak mampu mengelola dan memanfaatkan waktu dengan baik, maka waktu itu sendiri yang akan merugikan dan menghancurkan hidup kita.",
-      semantic_score: 0.8640
+      category: "Bab 6",
+      original_arabic: "فتى من أسلم\nعن أنس بنِ مالك، أنَّ فتىً من أسلمَ قال:\nيا رسولَ الله، إني أريدُ الغزوَ وليس معي ما أتجهَّز.\nقال: \"ائتِ فلانًا فإنه قد كان تجهَّزَ فمرض\".\nفأتاه, فقال: إنَّ رسولَ اللهِ صلَّى اللهُ عليه وسلَّمَ يُقرِئُكَ السلامَ ويقول: أَعطِني الذي تجهَّزتَ به.\nقال: يا فلانة، أَعطِيهِ الذي تجهَّزتُ به، ولا تَحبِسي عنه شيئًا، فواللهِ لا تَحبِسي منه شيئًا فيُبارَكَ لكِ فيه.\n",
+      system_translation: "Kisah Seorang Pemuda dari Bani Aslam\nDari Anas bin Malik RA, diceritakan ada salah seorang pemuda dari kabilah Aslam berkata:\n'Wahai utusan Allah, sesungguhnya aku sangat rindu ikut andil dalam peperangan (jihad) namun luput memiliki bekal/peralatan perang.'\nRasulullah mencanangkan jalan keluar: 'Temuilah si fulan, sungguh ia kemarin sudah bersiap sedia melengkapi persiapannya namun mendadak terserang sakit.'\nPemuda tersebut lekas menemuinya dan menyampaikan pesan: 'Bahwasanya Rasulullah SAW mengirim salam kepadamu dan menitahkan agar menyerahkan perbekalan perang yang sudah kau siapkan.'\nSahabat yang sakit itu langsung berseru pada istrinya: 'Wahai istriku, berikan pemuda ini seluruh perbekalan perang yang sudah kusiapkan, janganlah menahan sekecil apapun darinya, demi Allah demi keberkahan kita bersama.'",
+      ref_translation: " Seorang pemuda dari Aslam\nDari Anas bin Malik, bahwa seorang pemuda dari Aslam berkata:\n\"Wahai Rasulullah, aku ingin ikut berjihad, tetapi aku tidak memiliki perlengkapan apa pun.\"\nBeliau bersabda, \"Pergilah menemui si Fulan, karena dia telah menyiapkan perlengkapannya, tetapi kemudian jatuh sakit.\"\nMaka ia mendatangi orang itu, lalu ia berkata: \"Rasulullah shallallahu 'alaihi wa sallam mengucapkan salam kepadamu dan berkata: 'Berikanlah kepadaku apa yang telah kau persiapkan.'\"\nDia berkata: \"Wahai fulanah, berikanlah kepadanya apa yang telah kau persiapkan, dan jangan menahan apa pun darinya, karena demi Allah, janganlah kau menahan apa pun darinya, maka akan diberkahi bagimu karenanya.\"",
+      bleu_score: 0.8240,
+      system_summary: "Kisah kedermawanan seorang sahabat yang memberikan perlengkapan jihad militernya yang tidak terpakai karena sakit kepada seorang pemuda dari suku Aslam atas arahan Rasulullah.",
+      ref_summary: "Seorang pemuda dari kaum Aslam ingin ikut berjihad, tetapi tidak memiliki perlengkapan. Rasulullah ﷺ kemudian menyuruhnya menemui seorang sahabat yang sebelumnya telah menyiapkan perlengkapan untuk berjihad, tetapi tidak jadi berangkat karena sakit. ",
+      rouge_score: 0.7925,
+      pertanyaan: " Apa solusi Rasulullah Saw. terhadap pemuda dari kaum Aslam yang ingin ikut berjihad? ",
+      system_answer: "Rasulullah menganjurkan si pemuda menemui seorang sahabat tertentu (si Fulan) yang aslinya telah siap sedia bersenjata lengkap namun uzur karena sakit, agar perbekalan tersebut langsung dihadiahkan kepada pemuda Aslam.",
+      ref_answer: "Rasulullah ﷺ kemudian menyuruhnya menemui seorang sahabat yang sebelumnya telah menyiapkan perlengkapan untuk berjihad, tetapi tidak jadi berangkat karena sakit",
+      semantic_score: 0.8900
     }
   ]
 };
@@ -355,17 +355,26 @@ export default function AdminPanel() {
 
       {/* SECTION 3: Detailed evaluation Table logs */}
       <div className="bg-white border border-slate-150 rounded-2xl shadow-sm overflow-hidden min-w-full">
-        <div className="p-4 bg-slate-50 border-b border-slate-100 flex items-center justify-between">
+        <div className="p-5 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-0.5">
-            <h4 className="text-xs font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
-              <FileText className="w-4.5 h-4.5 text-slate-500" />
+            <h4 className="text-sm font-bold text-slate-800 uppercase tracking-wider flex items-center gap-1.5">
+              <FileText className="w-4.5 h-4.5 text-indigo-500" />
               Tabel Komparasi Log Evaluasi Uji Teks
             </h4>
-            <p className="text-[10px] text-slate-500">Klik baris tabel untuk mendalami teks arab, hasil generatif kecerdasan buatan, dan rujukan pakar sastra.</p>
+            <p className="text-[11px] text-slate-500">Klik baris tabel untuk mendalami teks arab, hasil generatif kecerdasan buatan, dan rujukan pakar sastra.</p>
           </div>
-          <span className="text-[10px] font-bold text-slate-600 bg-slate-200/80 px-2.5 py-1 rounded-full">
-            {evaluation.results.length} Pengujian Terbuka
+          <span className="text-[10px] font-bold text-slate-600 bg-slate-200/80 px-3 py-1 rounded-full w-fit">
+            {evaluation.results.length} Kueri Pengujian Aktif
           </span>
+        </div>
+
+        {/* Column Headers (Desktop Only) */}
+        <div className="hidden md:grid md:grid-cols-12 gap-4 px-6 py-3 bg-slate-100/70 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-150/60 select-none">
+          <div className="col-span-6">Kasus Uji & Pertanyaan Evaluasi</div>
+          <div className="col-span-1.5 text-center">BLEU (Translasi)</div>
+          <div className="col-span-1.5 text-center">ROUGE-L (Ringkasan)</div>
+          <div className="col-span-1.5 text-center">Semantik (Jawaban RAG)</div>
+          <div className="col-span-1.5 text-right">Aksi</div>
         </div>
 
         {/* Table Body */}
@@ -378,90 +387,112 @@ export default function AdminPanel() {
                 {/* Header row clicker */}
                 <div 
                   onClick={() => toggleRow(res.id)}
-                  className="px-4 py-3.5 flex items-center justify-between text-xs cursor-pointer hover:bg-slate-50 select-none"
+                  className="px-6 py-4 grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-center text-xs cursor-pointer hover:bg-slate-50 select-none transition duration-150"
                 >
-                  <div className="flex items-center gap-4">
-                    <span className="w-5 h-5 rounded-md bg-slate-150 text-slate-750 font-bold flex items-center justify-center font-mono text-[10px]">
+                  {/* Case Info and Question */}
+                  <div className="md:col-span-6 flex items-start gap-3">
+                    <span className="w-6 h-6 rounded-md bg-amber-500/10 text-amber-600 font-bold flex items-center justify-center font-mono text-xs shrink-0 mt-0.5">
                       {res.id}
                     </span>
-                    <div>
-                      <p className="font-bold text-slate-800">{res.category}</p>
-                      <p className="text-[10px] text-slate-450 truncate max-w-sm arabic-rtl text-right mt-0.5" dir="rtl">{res.original_arabic.substring(0, 60)}...</p>
+                    <div className="min-w-0 flex-1 space-y-1">
+                      <div className="flex items-center gap-2">
+                        <span className="px-2 py-0.5 rounded-full bg-slate-150 text-slate-700 font-bold text-[9px] uppercase tracking-wider">
+                          {res.category}
+                        </span>
+                      </div>
+                      <p className="font-bold text-slate-800 text-sm leading-snug">
+                        {res.pertanyaan}
+                      </p>
+                      <p className="text-[11px] text-slate-400 truncate max-w-lg arabic-rtl mt-1 text-right" dir="rtl">
+                        Teks Arab: {res.original_arabic.substring(0, 90)}...
+                      </p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-5 shrink-0 pl-4">
-                    {/* Micro Scores Pills */}
-                    <div className="hidden sm:flex items-center gap-3">
-                      <span className="inline-flex flex-col text-center">
-                        <span className="text-[9px] text-slate-400 font-bold">BLEU</span>
-                        <span className="font-mono font-bold text-indigo-600">{(res.bleu_score).toFixed(2)}</span>
-                      </span>
-                      <span className="inline-flex flex-col text-center">
-                        <span className="text-[9px] text-slate-400 font-bold">ROUGE</span>
-                        <span className="font-mono font-bold text-emerald-600">{(res.rouge_score).toFixed(2)}</span>
-                      </span>
-                      <span className="inline-flex flex-col text-center">
-                        <span className="text-[9px] text-slate-400 font-bold">COS SIM</span>
-                        <span className="font-mono font-bold text-amber-600">{(res.semantic_score).toFixed(2)}</span>
-                      </span>
-                    </div>
+                  {/* BLEU Score column */}
+                  <div className="md:col-span-1.5 flex md:flex-col items-center justify-between md:justify-center gap-1 bg-slate-50/50 md:bg-transparent p-2 md:p-0 rounded-lg">
+                    <span className="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">BLEU Score</span>
+                    <span className="font-mono font-bold text-indigo-600 text-sm">
+                      {Math.round(res.bleu_score * 100)}%
+                    </span>
+                  </div>
 
-                    {isExpanded ? <ChevronUp className="w-4.5 h-4.5 text-slate-400" /> : <ChevronDown className="w-4.5 h-4.5 text-slate-400" />}
+                  {/* ROUGE Score column */}
+                  <div className="md:col-span-1.5 flex md:flex-col items-center justify-between md:justify-center gap-1 bg-slate-50/50 md:bg-transparent p-2 md:p-0 rounded-lg">
+                    <span className="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">ROUGE-L Score</span>
+                    <span className="font-mono font-bold text-emerald-600 text-sm">
+                      {Math.round(res.rouge_score * 100)}%
+                    </span>
+                  </div>
+
+                  {/* Semantic Score column */}
+                  <div className="md:col-span-1.5 flex md:flex-col items-center justify-between md:justify-center gap-1 bg-slate-50/50 md:bg-transparent p-2 md:p-0 rounded-lg">
+                    <span className="md:hidden text-[10px] font-bold text-slate-450 uppercase tracking-widest">Semantic Match</span>
+                    <span className="font-mono font-bold text-amber-600 text-sm">
+                      {Math.round(res.semantic_score * 100)}%
+                    </span>
+                  </div>
+
+                  {/* Toggle button column */}
+                  <div className="md:col-span-1.5 flex items-center justify-end text-slate-400 gap-1.5">
+                    <span className="text-[10px] text-slate-450 font-semibold md:inline hidden mr-1">
+                      {isExpanded ? "Tutup" : "Analisis Detail"}
+                    </span>
+                    {isExpanded ? <ChevronUp className="w-4.5 h-4.5 text-slate-500" /> : <ChevronDown className="w-4.5 h-4.5 text-slate-500" />}
                   </div>
                 </div>
 
                 {/* Expanded metadata card */}
                 {isExpanded && (
-                  <div className="px-5 py-5 bg-slate-50/70 border-t border-slate-100 flex flex-col space-y-4 text-xs animate-fade-in divide-y divide-slate-150/40">
+                  <div className="px-6 py-6 bg-slate-50/70 border-t border-slate-100 flex flex-col space-y-5 text-xs animate-fade-in divide-y divide-slate-150/40">
                     
-                    {/* Original Arabic block */}
-                    <div className="space-y-1.5 pb-2">
-                      <h5 className="font-bold text-slate-700 flex items-center gap-1 text-[10px] uppercase tracking-wider">
-                        <BookOpen className="w-3.5 h-3.5 text-slate-500" />
-                        Aksara Sastra Arab Asli (Harakat Lengkap)
-                      </h5>
-                      <p className="arabic-rtl text-xl text-slate-900 leading-relaxed" dir="rtl">{res.original_arabic}</p>
-                    </div>
-
                     {/* Translation comparison */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2 pt-3">
-                      <div className="space-y-1.5">
-                        <h6 className="font-bold text-indigo-700 flex items-center gap-1 text-[9px] uppercase tracking-wider">🤖 Generasi Translasi Gemini 3.5 (BLEU: {res.bleu_score})</h6>
-                        <p className="p-3 bg-white border border-slate-150 rounded-xl leading-relaxed text-slate-700 font-medium">{res.system_translation}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-1">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <h6 className="font-bold text-indigo-700 flex items-center gap-1 text-[10px] uppercase tracking-wider">🤖 Generasi Translasi Gemini 3.5</h6>
+                          <span className="text-[10px] font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-md font-mono">BLEU: {Math.round(res.bleu_score * 100)}%</span>
+                        </div>
+                        <p className="p-4 bg-white border border-slate-200/80 rounded-xl leading-relaxed text-slate-800 font-medium text-sm shadow-2xs">{res.system_translation}</p>
                       </div>
-                      <div className="space-y-1.5">
-                        <h6 className="font-bold text-slate-600 flex items-center gap-1 text-[9px] uppercase tracking-wider">🎓 Rujukan Alih Bahasa Pakar (Ground Truth)</h6>
-                        <p className="p-3 bg-white border border-slate-150 rounded-xl leading-relaxed text-slate-600 italic font-medium">{res.ref_translation}</p>
+                      <div className="space-y-2">
+                        <h6 className="font-bold text-slate-600 flex items-center gap-1 text-[10px] uppercase tracking-wider">🎓 Rujukan Alih Bahasa Pakar (Ground Truth)</h6>
+                        <p className="p-4 bg-white border border-slate-200/80 rounded-xl leading-relaxed text-slate-600 italic font-medium text-sm shadow-2xs">{res.ref_translation}</p>
                       </div>
                     </div>
 
                     {/* Summarization comparison */}
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pb-2 pt-3">
-                      <div className="space-y-1.5">
-                        <h6 className="font-bold text-emerald-700 flex items-center gap-1 text-[9px] uppercase tracking-wider">🤖 Generasi Ringkasan Gemini 3.5 (ROUGE: {res.rouge_score})</h6>
-                        <p className="p-3 bg-white border border-slate-150 rounded-xl leading-relaxed text-slate-700 font-medium">{res.system_summary}</p>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-1 pt-4">
+                      <div className="space-y-2">
+                        <div className="flex justify-between items-center">
+                          <h6 className="font-bold text-emerald-700 flex items-center gap-1 text-[10px] uppercase tracking-wider">🤖 Generasi Ringkasan Gemini 3.5</h6>
+                          <span className="text-[10px] font-bold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md font-mono">ROUGE-L: {Math.round(res.rouge_score * 100)}%</span>
+                        </div>
+                        <p className="p-4 bg-white border border-slate-200/80 rounded-xl leading-relaxed text-slate-800 font-medium text-sm shadow-2xs">{res.system_summary}</p>
                       </div>
-                      <div className="space-y-1.5">
-                        <h6 className="font-bold text-slate-600 flex items-center gap-1 text-[9px] uppercase tracking-wider">🎓 Rujukan Sinopsis Pakar (Ground Truth)</h6>
-                        <p className="p-3 bg-white border border-slate-150 rounded-xl leading-relaxed text-slate-600 italic font-medium">{res.ref_summary}</p>
+                      <div className="space-y-2">
+                        <h6 className="font-bold text-slate-600 flex items-center gap-1 text-[10px] uppercase tracking-wider">🎓 Rujukan Sinopsis Pakar (Ground Truth)</h6>
+                        <p className="p-4 bg-white border border-slate-200/80 rounded-xl leading-relaxed text-slate-600 italic font-medium text-sm shadow-2xs">{res.ref_summary}</p>
                       </div>
                     </div>
 
                     {/* Q&A comparison */}
-                    <div className="space-y-3 pt-3">
-                      <div className="bg-amber-50/70 border border-amber-100 p-3.5 rounded-xl space-y-1">
-                        <h6 className="font-bold text-amber-800 text-[10px] uppercase">Pertanyaan Evaluasi Konsistensi Semantik:</h6>
-                        <p className="font-bold text-slate-800 text-sm">“{res.pertanyaan}”</p>
+                    <div className="space-y-4 pt-4">
+                      <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-xl space-y-1 shadow-2xs">
+                        <h6 className="font-bold text-amber-800 text-[10px] uppercase tracking-wider">Pertanyaan Uji Pemahaman & Konsistensi Semantik:</h6>
+                        <p className="font-extrabold text-slate-900 text-sm">“{res.pertanyaan}”</p>
                       </div>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-1.5">
-                          <h6 className="font-bold text-amber-700 flex items-center gap-1 text-[9px] uppercase tracking-wider">🤖 Generasi Jawab RAG Pipeline (Kosinus: {res.semantic_score})</h6>
-                          <p className="p-3 bg-white border border-slate-150 rounded-xl leading-relaxed text-slate-700 font-medium">{res.system_answer}</p>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <h6 className="font-bold text-amber-700 flex items-center gap-1 text-[10px] uppercase tracking-wider">🤖 Generasi Jawab RAG Pipeline</h6>
+                            <span className="text-[10px] font-bold text-amber-600 bg-amber-50 px-2 py-0.5 rounded-md font-mono">Cosine Sim: {Math.round(res.semantic_score * 100)}%</span>
+                          </div>
+                          <p className="p-4 bg-white border border-slate-200/80 rounded-xl leading-relaxed text-slate-800 font-medium text-sm shadow-2xs">{res.system_answer}</p>
                         </div>
-                        <div className="space-y-1.5">
-                          <h6 className="font-bold text-slate-600 flex items-center gap-1 text-[9px] uppercase tracking-wider">🎓 Rujukan Jawaban Pakar (Ground Truth)</h6>
-                          <p className="p-3 bg-white border border-slate-150 rounded-xl leading-relaxed text-slate-600 italic font-medium">{res.ref_answer}</p>
+                        <div className="space-y-2">
+                          <h6 className="font-bold text-slate-600 flex items-center gap-1 text-[10px] uppercase tracking-wider">🎓 Rujukan Jawaban Pakar (Ground Truth)</h6>
+                          <p className="p-4 bg-white border border-slate-200/80 rounded-xl leading-relaxed text-slate-600 italic font-medium text-sm shadow-2xs">{res.ref_answer}</p>
                         </div>
                       </div>
                     </div>

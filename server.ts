@@ -359,7 +359,7 @@ Teks Arab: ${item.chunk.text}`
     console.log(`Top similar chunk scores:`, topK.map(t => t.score));
 
     // 3. System Instructions
-    const systemPrompt = `You are an expert assistant for analyzing Arabic literature. You must answer the user's question strictly based on the provided retrieved context. Do not hallucinate external information. If the context does not contain the answer, explicitly state that the information is not available in the text. Respond in the language the user asks the question (mostly Indonesian).
+    const systemPrompt = `You are an expert assistant for analyzing Arabic literature. You must answer the user's question strictly based on the provided retrieved context. Do not hallucinate external information. If the context does not contain the answer, explicitly state that the information is not available in the text. You must respond in the EXACT same language that the user asks the question in (e.g., if asked in English, answer in English; if in Portuguese, answer in Portuguese; if in Indonesian, answer in Indonesian; if in Arabic, answer in Arabic, etc.).
 
 Berikut adalah referensi konteks sastra Arab yang relevan untuk menjawab pertanyaan:
 ${contextBlock}`;

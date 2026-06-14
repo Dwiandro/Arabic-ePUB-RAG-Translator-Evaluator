@@ -140,7 +140,7 @@ export default function SidebarChat({
   };
 
   return (
-    <div className={`fixed inset-y-0 right-0 z-40 w-full sm:w-96 h-[100dvh] max-h-[100dvh] md:h-full md:max-h-full bg-slate-900 border-l border-slate-850 flex flex-col transition-all duration-300 transform ${
+    <div className={`fixed inset-y-0 right-0 z-[60] md:z-40 w-full sm:w-96 h-[100dvh] max-h-[100dvh] md:h-full md:max-h-full bg-slate-900 border-l border-slate-850 flex flex-col transition-all duration-300 transform ${
       isOpenOnMobile 
         ? 'translate-x-0 md:translate-x-0 md:static' 
         : 'translate-x-full md:hidden'

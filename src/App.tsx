@@ -95,7 +95,7 @@ export default function App() {
               {isChatOpenMobile && (
                 <div 
                   onClick={() => setIsChatOpenMobile(false)}
-                  className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-35 md:hidden transition-opacity"
+                  className="fixed inset-0 bg-slate-950/40 backdrop-blur-xs z-[55] md:hidden transition-opacity"
                 />
               )}
 
