@@ -44,31 +44,39 @@ interface VectorItem {
 
 let vectorStore: VectorItem[] = [];
 
-// Lazy-initialized transformers.js embedding model
-let transformersInstance: any = null;
-
-async function getEmbeddingPipeline() {
-  if (!transformersInstance) {
-    try {
-      // Dynamically import transformers.js to maintain esbuild CJS/ESM flexibility
-      const { pipeline, env } = await import("@xenova/transformers");
-      env.allowLocalModels = false; // Pull from HuggingFace Hub on-demand without local caching errors
-      transformersInstance = await pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
-    } catch (err) {
-      console.error("Failed to load local transformers.js pipeline:", err);
-      throw new Error(`Embedding model failure: ${err instanceof Error ? err.message : String(err)}`);
-    }
+// Cloud-based Google GenAI gemini-embedding-2-preview integration
+/**
+ * Computes embedding vector (768-dim) for a single text using gemini-embedding-2-preview.
+ */
+async function generateEmbedding(text: string): Promise<number[]> {
+  const ai = getGeminiClient();
+  const response = await callGeminiWithRetry(() => ai.models.embedContent({
+    model: "gemini-embedding-2-preview",
+    contents: text,
+  }));
+  
+  if (response.embedding) {
+    return response.embedding.values;
+  } else if (response.embeddings && response.embeddings[0]) {
+    return response.embeddings[0].values;
   }
-  return transformersInstance;
+  throw new Error("Invalid response from Gemini Embedding API");
 }
 
 /**
- * Computes embedding vector (384-dim) for a given text.
+ * Generates multiple embedding vectors (768-dim) for given texts.
+ * To respect the APIs constraints and guarantee high precision, this helper processes
+ * texts in sequential batches of individual requests, gracefully handling rates limits.
  */
-async function generateEmbedding(text: string): Promise<number[]> {
-  const extractor = await getEmbeddingPipeline();
-  const output = await extractor(text, { pooling: "mean", normalize: true });
-  return Array.from(output.data) as number[];
+async function generateEmbeddings(texts: string[]): Promise<number[][]> {
+  const results: number[][] = [];
+  for (const text of texts) {
+    const vector = await generateEmbedding(text);
+    results.push(vector);
+    // Tiny sleep to guard standard model quotas
+    await new Promise((resolve) => setTimeout(resolve, 80));
+  }
+  return results;
 }
 
 /**
@@ -221,21 +229,43 @@ app.post("/api/upload-epub", async (req, res) => {
       });
     }
 
-    // Embed and index retrieved chunks asynchronously into memory vector store
-    console.log(`Generating embedding vectors for ${documentChunks.length} Arabic chunks...`);
+    // Embed and index retrieved chunks asynchronously into memory vector store.
+    // To ensure extreme reliability, we process the chunks with granular individual error trapping 
+    // so that an API error on a single irregular chunk doesn't result in dropping any other chunks.
+    console.log(`Generating embedding vectors for ${documentChunks.length} Arabic chunks with granular error handling...`);
     const tempStore: VectorItem[] = [];
+    const CONCURRENCY_LIMIT = 3; // Fully compliant with standard rate bounds and preserves system responsiveness
 
-    // Process chunk embeds sequentially to avoid overloading local CPU thread bounds
-    for (const item of documentChunks) {
-      try {
-        const itemEmbedding = await generateEmbedding(item.text);
-        tempStore.push({
-          id: item.id,
-          chunk: item,
-          embedding: itemEmbedding
-        });
-      } catch (embErr) {
-        console.error(`Skipping embedding generation for chunk ID ${item.id}:`, embErr);
+    for (let i = 0; i < documentChunks.length; i += CONCURRENCY_LIMIT) {
+      const chunkBatch = documentChunks.slice(i, i + CONCURRENCY_LIMIT);
+      console.log(`Processing chunks ${i + 1} - ${Math.min(i + CONCURRENCY_LIMIT, documentChunks.length)} out of ${documentChunks.length}...`);
+      
+      const promises = chunkBatch.map(async (item) => {
+        try {
+          const embeddingValues = await generateEmbedding(item.text);
+          return {
+            id: item.id,
+            chunk: item,
+            embedding: embeddingValues
+          };
+        } catch (embErr) {
+          console.error(`Skipping embedding generation for chunk ID ${item.id} due to API/formatting issue:`, embErr);
+          return null;
+        }
+      });
+
+      const results = await Promise.all(promises);
+
+      // Securely accumulate all successfully completed embeddings
+      for (const res of results) {
+        if (res) {
+          tempStore.push(res);
+        }
+      }
+
+      // Gentle rate-limiting protection delay between micro-batches to sustain steady API delivery
+      if (i + CONCURRENCY_LIMIT < documentChunks.length) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
@@ -405,109 +435,110 @@ ${contextBlock}`;
 
 /**
  * 4. Automated Evaluation Pipeline endpoint (Admin Dashboard)
- * Computes BLEU, ROUGE-L, and local Cosine Similarity against ground-truth in eval_dataset.json.
- * Uses a single highly optimized bulk request to prevent rate limiting issues (HTTP 429).
+ * Computes BLEU, ROUGE-L, and Semantic Similarity against ground-truth in eval_dataset.json.
+ * Uses sequential processing with sleep intervals to perfectly bypass the 15 RPM rate limiting constraints.
+ * Leverages Server-Sent Events (SSE) to stream live progress updates to the frontend dashboard.
  */
-app.post("/api/evaluate", async (req, res) => {
+app.get("/api/evaluate", async (req, res) => {
+  // Set headers for Server-Sent Events (SSE)
+  res.setHeader("Content-Type", "text/event-stream");
+  res.setHeader("Cache-Control", "no-cache");
+  res.setHeader("Connection", "keep-alive");
+
+  const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
   try {
     const datasetPath = path.join(process.cwd(), "eval_dataset.json");
     if (!fs.existsSync(datasetPath)) {
-      return res.status(404).json({ error: "File eval_dataset.json tidak ditemukan dilingkungan server." });
+      res.write(`data: ${JSON.stringify({ type: "error", message: "File eval_dataset.json tidak ditemukan dilingkungan server." })}\n\n`);
+      return res.end();
     }
 
     const rawData = fs.readFileSync(datasetPath, "utf-8");
     const testCases = JSON.parse(rawData);
 
-    console.log(`Starting NLP Evaluation Pipeline for ${testCases.length} academic cases in bulk...`);
+    console.log(`Starting NLP SSE Evaluation Pipeline for ${testCases.length} academic cases...`);
     const ai = getGeminiClient();
-
-    // Prepare bulk request to avoid hitting 429 rate limit
-    const inputDataset = testCases.map((test: any) => ({
-      id: test.id,
-      original_arabic: test.original_arabic,
-      pertanyaan: test.pertanyaan
-    }));
-
-    const evaluationPrompt = `You are an academic NLP evaluation engine for Arabic literature. 
-Below is an array of independent Arabic literary texts and associated Q&A questions.
-For each item in the array, you MUST perform three tasks:
-1. "system_translation": Translate the 'original_arabic' text to Indonesian of high literary and poetic quality. 
-2. "system_summary": Provide a concise objective summary (1-2 sentences) of the 'original_arabic' text in Indonesian.
-3. "system_answer": Answer the provided 'pertanyaan' strictly based on the 'original_arabic' text provided. Do not use external facts.
-
-You must respond as a JSON array of objects following the exact responseSchema matching the index "id".
-
-Input Array:
-${JSON.stringify(inputDataset, null, 2)}`;
-
-    console.log("Sending single optimized bulk evaluation query to Gemini API...");
-    const response = await callGeminiWithRetry(() => ai.models.generateContent({
-      model: "gemini-3.5-flash",
-      contents: evaluationPrompt,
-      config: {
-        temperature: 0.2,
-        responseMimeType: "application/json",
-        responseSchema: {
-          type: Type.ARRAY,
-          items: {
-            type: Type.OBJECT,
-            properties: {
-              id: { type: Type.INTEGER, description: "ID matching the input item ID" },
-              system_translation: { type: Type.STRING, description: "The Indonesian translation of the Arabic text" },
-              system_summary: { type: Type.STRING, description: "The Indonesian summary of the Arabic text" },
-              system_answer: { type: Type.STRING, description: "The Indonesian answer to the question based ONLY on the Arabic text" }
-            },
-            required: ["id", "system_translation", "system_summary", "system_answer"]
-          }
-        }
-      }
-    }));
-
-    const outputText = response.text;
-    if (!outputText) {
-      throw new Error("Empty bulk generation response from Gemini.");
-    }
-
-    const bulkResults = JSON.parse(outputText.trim());
-    console.log(`Successfully received bulk response for ${bulkResults.length} cases.`);
 
     const results: any[] = [];
     let sumBleu = 0;
     let sumRouge = 0;
     let sumSemantic = 0;
 
-    for (const test of testCases) {
-      // Find the generated results for this specific test ID
-      const generated = bulkResults.find((r: any) => r && r.id === test.id) || {};
-      
+    for (let i = 0; i < testCases.length; i++) {
+      const test = testCases[i];
+      console.log(`Evaluating case ${i + 1}/${testCases.length} (ID: ${test.id})...`);
+
+      // Construct isolation prompt for single test case to achieve maximal prompt execution accuracy
+      const evaluationPrompt = `You are an academic NLP evaluation engine for Arabic literature.
+We are analyzing this specific Arabic literary text:
+Original Arabic: "${test.original_arabic}"
+Question: "${test.pertanyaan}"
+
+Please perform three tasks:
+1. "system_translation": Translate the 'original_arabic' text to Indonesian of high literary and poetic quality. 
+2. "system_summary": Provide a concise objective summary (1-2 sentences) of the 'original_arabic' text in Indonesian.
+3. "system_answer": Answer the provided 'pertanyaan' strictly based on the 'original_arabic' text provided. Do not use external facts.
+
+You MUST reply with a JSON object following this exact schema:
+{
+  "system_translation": "string",
+  "system_summary": "string",
+  "system_answer": "string"
+}`;
+
+      // Hit Gemini API for this specific single test case
+      const response = await callGeminiWithRetry(() => ai.models.generateContent({
+        model: "gemini-3.5-flash",
+        contents: evaluationPrompt,
+        config: {
+          temperature: 0.2,
+          responseMimeType: "application/json",
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              system_translation: { type: Type.STRING, description: "Translation of the Arabic text to Indonesian" },
+              system_summary: { type: Type.STRING, description: "Summary of the Arabic text to Indonesian" },
+              system_answer: { type: Type.STRING, description: "Answer to the question based on the Arabic text" }
+            },
+            required: ["system_translation", "system_summary", "system_answer"]
+          }
+        }
+      }));
+
+      const outputText = response.text;
+      if (!outputText) {
+        throw new Error(`Empty response returned from Gemini for case ID #${test.id}`);
+      }
+
+      const generated = JSON.parse(outputText.trim());
       const systemTranslation = (generated.system_translation || "").trim();
       const systemSummary = (generated.system_summary || "").trim();
       const systemAnswer = (generated.system_answer || "").trim();
 
-      // Compute BLEU metric
+      // Compute BLEU score
       const bleuScore = calculateBLEU(systemTranslation, test.referensi_translasi);
 
-      // Compute ROUGE-L metric
+      // Compute ROUGE-L score
       const rougeScore = calculateROUGEL(systemSummary, test.referensi_ringkasan);
 
-      // Generate embeddings to compute Semantic Cosine Similarity Score using transformers.js
+      // Compute Semantic similarity using cloud-based text-embedding-004 vectors
       let semanticScore = 0;
       try {
         const sysAnswerVec = await generateEmbedding(systemAnswer);
         const refAnswerVec = await generateEmbedding(test.referensi_jawaban);
         semanticScore = calculateCosineSimilarity(sysAnswerVec, refAnswerVec);
       } catch (embErr) {
-        console.error(`Local embedding failure during evaluation of case ID #${test.id}:`, embErr);
-        // Fallback token-based overlap score in case local embedding pipeline failures
+        console.error(`Cloud embedding failure during evaluation of case ID #${test.id}:`, embErr);
         semanticScore = calculateROUGEL(systemAnswer, test.referensi_jawaban);
       }
 
-      // Add to sums
+      // Add to averages
       sumBleu += bleuScore;
       sumRouge += rougeScore;
       sumSemantic += semanticScore;
 
-      results.push({
+      const testResult = {
         id: test.id,
         category: test.category,
         original_arabic: test.original_arabic,
@@ -523,7 +554,24 @@ ${JSON.stringify(inputDataset, null, 2)}`;
         system_answer: systemAnswer,
         ref_answer: test.referensi_jawaban,
         semantic_score: Number(semanticScore.toFixed(4))
-      });
+      };
+
+      results.push(testResult);
+
+      // Stream the progress and the result of this completed test case back to client
+      res.write(`data: ${JSON.stringify({ 
+        type: "progress", 
+        current: i + 1, 
+        total: testCases.length, 
+        message: `Berhasil memproses Kasus ${i + 1} dari ${testCases.length} (${test.category})...`,
+        result: testResult
+      })}\n\n`);
+
+      // Gentle rate limit protection delay between items
+      if (i < testCases.length - 1) {
+        console.log(`Rate limit guard sleep: waiting 4000ms for next item...`);
+        await sleep(4000);
+      }
     }
 
     const summary = {
@@ -534,17 +582,19 @@ ${JSON.stringify(inputDataset, null, 2)}`;
       results: results
     };
 
-    console.log("Automated bulk evaluation success! Metrics summary:", {
+    console.log("Automated sequential evaluation success! Summary:", {
       avg_bleu: summary.average_bleu,
       avg_rouge: summary.average_rouge,
       avg_semantic: summary.average_semantic
     });
 
-    res.json(summary);
+    res.write(`data: ${JSON.stringify({ type: "complete", summary })}\n\n`);
+    res.end();
 
   } catch (error) {
     console.error("Evaluation pipeline crashed:", error);
-    res.status(500).json({ error: `Gagal menjalankan program evaluasi: ${error instanceof Error ? error.message : String(error)}` });
+    res.write(`data: ${JSON.stringify({ type: "error", message: error instanceof Error ? error.message : String(error) })}\n\n`);
+    res.end();
   }
 });
 

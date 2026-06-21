@@ -121,29 +121,69 @@ export default function AdminPanel() {
   const [isRunning, setIsRunning] = useState(false);
   const [expandedId, setExpandedId] = useState<number | null>(null);
   const [notification, setNotification] = useState<string | null>(null);
+  const [progress, setProgress] = useState<{ current: number; total: number; message: string } | null>(null);
 
-  const handleRunEvaluation = async () => {
+  const handleRunEvaluation = () => {
     setIsRunning(true);
     setNotification(null);
-    try {
-      const response = await fetch('/api/evaluate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' }
-      });
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'Proses uji evaluasi di server gagal.');
+    setProgress({ current: 0, total: 5, message: "Menghubungkan ke server evaluasi..." });
+
+    // Open Server-Sent Events (SSE) connection cleanly to the GET endpoint
+    const eventSource = new EventSource("/api/evaluate");
+
+    eventSource.onmessage = (event) => {
+      try {
+        const data = JSON.parse(event.data);
+        if (data.type === "progress") {
+          setProgress({
+            current: data.current,
+            total: data.total,
+            message: data.message
+          });
+          // Update evaluation live as we progress so the table populates in real time
+          if (data.result) {
+            setEvaluation(prev => {
+              const cleanedResults = prev.results.filter(r => r.id !== data.result.id);
+              const updatedResults = [...cleanedResults, data.result].sort((a, b) => a.id - b.id);
+              
+              // Recalculate dynamic cumulative averages for progress indicators
+              const sumB = updatedResults.reduce((acc, r) => acc + r.bleu_score, 0);
+              const sumR = updatedResults.reduce((acc, r) => acc + r.rouge_score, 0);
+              const sumS = updatedResults.reduce((acc, r) => acc + r.semantic_score, 0);
+
+              return {
+                average_bleu: sumB / updatedResults.length,
+                average_rouge: sumR / updatedResults.length,
+                average_semantic: sumS / updatedResults.length,
+                total_cases: prev.total_cases,
+                results: updatedResults
+              };
+            });
+          }
+        } else if (data.type === "complete") {
+          setEvaluation(data.summary);
+          setNotification("✅ Evaluasi komparasi sukses! Data visualisasi di dashboard diperbarui dengan hasil real-time.");
+          setProgress(null);
+          setIsRunning(false);
+          eventSource.close();
+        } else if (data.type === "error") {
+          alert(`Gagal menjalankan evaluasi: ${data.message}`);
+          setIsRunning(false);
+          setProgress(null);
+          eventSource.close();
+        }
+      } catch (err) {
+        console.error("Gagal mengurai respons streaming SSE:", err);
       }
+    };
 
-      setEvaluation(data);
-      setNotification('✅ Evaluasi komparasi sukses! Data visualisasi di dashboard diperbarui dengan hasil real-time.');
-
-    } catch (err: any) {
-      alert(`Gagal menjalankan evaluasi: ${err.message}`);
-    } finally {
+    eventSource.onerror = (err) => {
+      console.error("SSE Connection Error:", err);
+      alert("Terjadi kegagalan koneksi streaming evaluasi. Silakan periksa kunci API atau log server Anda.");
       setIsRunning(false);
-    }
+      setProgress(null);
+      eventSource.close();
+    };
   };
 
   const toggleRow = (id: number) => {
@@ -171,7 +211,7 @@ export default function AdminPanel() {
           </span>
           <h2 className="text-xl sm:text-2xl font-bold tracking-tight">Systematic Evaluation Dashboard</h2>
           <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed">
-            Metrik evaluator yang dirancang secara saintifik untuk menguji performansi pilar NLP pada aplikasi: Kualitas translasi (BLEU), akurasi ringkasan (ROUGE-L), serta presisi pencocokan RAG menggunakan model kedekatan kosinus dari embeddings lokal berbasis <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono text-xs">all-MiniLM-L6-v2</code>.
+            Metrik evaluator yang dirancang secara saintifik untuk menguji performansi pilar NLP pada aplikasi: Kualitas translasi (BLEU), akurasi ringkasan (ROUGE-L), serta presisi pencocokan RAG menggunakan model kedekatan kosinus dari Google Cloud <code className="bg-slate-800 px-1.5 py-0.5 rounded text-amber-300 font-mono text-xs">gemini-embedding-2-preview</code>.
           </p>
         </div>
 
@@ -299,7 +339,7 @@ export default function AdminPanel() {
             </div>
           </div>
           <p className="text-[11px] text-slate-500 leading-relaxed pt-1">
-            Mengukur keterkaitan makna (vektor 384 miliki Xenova) jawaban kueri chatbot RAG dengan jawaban pakar sastra.
+            Mengukur keterkaitan makna (vektor 768 dimensi Google Cloud) jawaban kueri chatbot RAG dengan jawaban pakar sastra.
           </p>
         </div>
 
@@ -318,39 +358,68 @@ export default function AdminPanel() {
         </div>
 
         {/* Recharts Container */}
-        <div className="h-72 w-full pt-4">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart
-              data={chartData}
-              margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
-            >
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
-              <XAxis 
-                dataKey="name" 
-                tick={{ fill: '#64748B', fontSize: 11, fontWeight: 'medium' }} 
-                axisLine={{ stroke: '#CBD5E1' }}
-              />
-              <YAxis 
-                domain={[0, 100]} 
-                tick={{ fill: '#64748B', fontSize: 11 }}
-                axisLine={{ stroke: '#CBD5E1' }}
-              />
-              <Tooltip 
-                contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
-                itemStyle={{ color: '#fff' }}
-              />
-              <Legend 
-                verticalAlign="bottom" 
-                height={36} 
-                iconType="circle"
-                wrapperStyle={{ fontSize: '11px', fontWeight: 'semibold', color: '#475569' }}
-              />
-              <Bar dataKey="BLEU (Translasi)" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={14} />
-              <Bar dataKey="ROUGE (Ringkasan)" fill="#10B981" radius={[4, 4, 0, 0]} barSize={14} />
-              <Bar dataKey="Semantik (RAG)" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={14} />
-            </BarChart>
-          </ResponsiveContainer>
-        </div>
+        {isRunning ? (
+          <div className="h-72 w-full flex flex-col items-center justify-center bg-slate-50 border border-dashed border-slate-250 rounded-2xl p-6 space-y-4">
+            <div className="flex items-center gap-2.5">
+              <Loader2 className="w-6 h-6 text-amber-500 animate-spin" />
+              <p className="text-xs font-bold font-mono text-slate-700 uppercase tracking-wider">
+                Mengevaluasi Model RAG secara Real-Time via Google Cloud...
+              </p>
+            </div>
+            
+            {progress && (
+              <div className="w-full max-w-md space-y-2">
+                <div className="flex justify-between text-[11px] font-bold text-slate-500 uppercase tracking-wide">
+                  <span>{progress.message}</span>
+                  <span>{progress.current} / {progress.total}</span>
+                </div>
+                <div className="w-full bg-slate-200 rounded-full h-2.5 overflow-hidden shadow-inner">
+                  <div 
+                    className="bg-amber-500 h-2.5 rounded-full transition-all duration-300"
+                    style={{ width: `${(progress.current / progress.total) * 100}%` }}
+                  />
+                </div>
+                <div className="text-[10px] text-center text-slate-400 font-medium italic">
+                  Menjaga 15 RPM Rate-Limits dengan jeda penundaan 4 detik
+                </div>
+              </div>
+            )}
+          </div>
+        ) : (
+          <div className="h-72 w-full pt-4">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart
+                data={chartData}
+                margin={{ top: 10, right: 10, left: -20, bottom: 5 }}
+              >
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#E2E8F0" />
+                <XAxis 
+                  dataKey="name" 
+                  tick={{ fill: '#64748B', fontSize: 11, fontWeight: 'medium' }} 
+                  axisLine={{ stroke: '#CBD5E1' }}
+                />
+                <YAxis 
+                  domain={[0, 100]} 
+                  tick={{ fill: '#64748B', fontSize: 11 }}
+                  axisLine={{ stroke: '#CBD5E1' }}
+                />
+                <Tooltip 
+                  contentStyle={{ backgroundColor: '#0F172A', borderRadius: '12px', border: 'none', color: '#fff', fontSize: '12px' }}
+                  itemStyle={{ color: '#fff' }}
+                />
+                <Legend 
+                  verticalAlign="bottom" 
+                  height={36} 
+                  iconType="circle"
+                  wrapperStyle={{ fontSize: '11px', fontWeight: 'semibold', color: '#475569' }}
+                />
+                <Bar dataKey="BLEU (Translasi)" fill="#6366F1" radius={[4, 4, 0, 0]} barSize={14} />
+                <Bar dataKey="ROUGE (Ringkasan)" fill="#10B981" radius={[4, 4, 0, 0]} barSize={14} />
+                <Bar dataKey="Semantik (RAG)" fill="#F59E0B" radius={[4, 4, 0, 0]} barSize={14} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        )}
       </div>
 
       {/* SECTION 3: Detailed evaluation Table logs */}
