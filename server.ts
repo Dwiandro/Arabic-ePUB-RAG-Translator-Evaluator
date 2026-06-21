@@ -44,6 +44,13 @@ interface VectorItem {
 
 let vectorStore: VectorItem[] = [];
 
+let uploadProgress = {
+  current: 0,
+  total: 0,
+  state: "idle",
+  fileName: ""
+};
+
 // Cloud-based Google GenAI gemini-embedding-2-preview integration
 /**
  * Computes embedding vector (768-dim) for a single text using gemini-embedding-2-preview.
@@ -142,6 +149,13 @@ app.get("/api/health", (req, res) => {
 });
 
 /**
+ * Endpoint to retrieve ongoing upload, parse, and embedding progress.
+ */
+app.get("/api/upload-progress", (req, res) => {
+  res.json(uploadProgress);
+});
+
+/**
  * 1. Upload & Parse Arabic ePUB File via Base64 JSON Payload.
  * Splitting text based strictly on intact paragraphs, cleaning noisy html, and populating RAG vector store.
  */
@@ -151,6 +165,13 @@ app.post("/api/upload-epub", async (req, res) => {
     if (!file) {
       return res.status(400).json({ error: "Missing 'file' base64 parameters" });
     }
+
+    uploadProgress = {
+      current: 0,
+      total: 0,
+      state: "parsing",
+      fileName: name || "Dokumen Arab"
+    };
 
     console.log(`Parsing ePUB upload: "${name}"...`);
     const buffer = Buffer.from(file, "base64");
@@ -236,6 +257,10 @@ app.post("/api/upload-epub", async (req, res) => {
     const tempStore: VectorItem[] = [];
     const CONCURRENCY_LIMIT = 3; // Fully compliant with standard rate bounds and preserves system responsiveness
 
+    uploadProgress.total = documentChunks.length;
+    uploadProgress.state = "embedding";
+    uploadProgress.current = 0;
+
     for (let i = 0; i < documentChunks.length; i += CONCURRENCY_LIMIT) {
       const chunkBatch = documentChunks.slice(i, i + CONCURRENCY_LIMIT);
       console.log(`Processing chunks ${i + 1} - ${Math.min(i + CONCURRENCY_LIMIT, documentChunks.length)} out of ${documentChunks.length}...`);
@@ -263,6 +288,8 @@ app.post("/api/upload-epub", async (req, res) => {
         }
       }
 
+      uploadProgress.current = Math.min(i + CONCURRENCY_LIMIT, documentChunks.length);
+
       // Gentle rate-limiting protection delay between micro-batches to sustain steady API delivery
       if (i + CONCURRENCY_LIMIT < documentChunks.length) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
@@ -272,6 +299,8 @@ app.post("/api/upload-epub", async (req, res) => {
     // Overwrite the vector store for the session
     vectorStore = tempStore;
     console.log(`Successfully parsed ePUB document and indexed ${vectorStore.length} chunks!`);
+    
+    uploadProgress.state = "done";
 
     res.json({
       name: name || "Dokumen Arab",
@@ -281,6 +310,7 @@ app.post("/api/upload-epub", async (req, res) => {
 
   } catch (error) {
     console.error("ePUB Parsing failure:", error);
+    uploadProgress.state = "error";
     res.status(500).json({ error: `Gagal memproses file ePUB: ${error instanceof Error ? error.message : String(error)}` });
   }
 });

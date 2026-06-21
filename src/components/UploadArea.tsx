@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Upload, FileText, Loader2, Sparkles, AlertCircle, RefreshCw } from 'lucide-react';
 
 interface UploadAreaProps {
@@ -14,7 +14,38 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
   const [isDragActive, setIsDragActive] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [progress, setProgress] = useState<{
+    current: number;
+    total: number;
+    state: string;
+    fileName: string;
+  } | null>(null);
+
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    let intervalId: any = null;
+    if (isLoading) {
+      intervalId = setInterval(async () => {
+        try {
+          const response = await fetch('/api/upload-progress');
+          if (response.ok) {
+            const data = await response.json();
+            setProgress(data);
+          }
+        } catch (err) {
+          console.error("Error fetching upload progress:", err);
+        }
+      }, 700);
+    } else {
+      setProgress(null);
+    }
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [isLoading]);
 
   // Drag handlers
   const handleDrag = (e: React.DragEvent) => {
@@ -126,13 +157,43 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
         />
 
         {isLoading ? (
-          <div className="space-y-4 py-4">
+          <div className="space-y-5 py-4 w-full max-w-md mx-auto">
             <Loader2 className="w-12 h-12 text-amber-500 animate-spin mx-auto" />
-            <div className="space-y-1">
-              <p className="text-sm font-bold text-slate-800 animate-pulse">Menambang & Memparsing Berkas ePUB...</p>
-              <p className="text-xs text-slate-500 max-w-sm mx-auto">
-                Mengekstrak file XHTML, menyaring paragraf bertashkil (harakat), serta menghasilkan representasi vektor embeddings lokal.
-              </p>
+            <div className="space-y-3">
+              {(!progress || progress.state === 'parsing') ? (
+                <>
+                  <p className="text-sm font-bold text-slate-850 animate-pulse text-center">Menambang & Memparsing Berkas ePUB...</p>
+                  <p className="text-xs text-slate-500 max-w-sm mx-auto text-center">
+                    Mengekstrak file XHTML, menyaring paragraf bertashkil (harakat), serta menguraikan struktur dokumen.
+                  </p>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm font-bold text-slate-800 text-center">
+                    Menghasilkan Embedding: <span className="text-amber-600 font-mono text-base">{progress.current}</span> / <span className="text-slate-500 font-mono text-sm">{progress.total}</span> chunk
+                  </p>
+                  
+                  {/* Visual Progress Bar */}
+                  <div className="w-full bg-slate-100 rounded-full h-3 border border-slate-200/60 overflow-hidden relative shadow-xs">
+                    <div 
+                      className="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-300 ease-out shadow-xs"
+                      style={{ width: `${progress.total > 0 ? Math.min(100, Math.round((progress.current / progress.total) * 100)) : 0}%` }}
+                    />
+                  </div>
+                  
+                  <div className="flex justify-between items-center text-[11px] text-slate-500 px-1 font-medium">
+                    <span>Progres: {progress.total > 0 ? Math.round((progress.current / progress.total) * 100) : 0}%</span>
+                    <span className="animate-pulse flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 bg-amber-500 rounded-full inline-block" />
+                      Memproses vektor embeddings...
+                    </span>
+                  </div>
+                  
+                  <p className="text-[11.5px] text-slate-400 text-center">
+                    Menggunakan model <code className="bg-slate-100 border border-slate-200 px-1.5 py-0.5 rounded font-mono font-semibold text-slate-600">gemini-embedding-2-preview</code>
+                  </p>
+                </>
+              )}
             </div>
           </div>
         ) : (
@@ -191,7 +252,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
           <li className="flex gap-2">
             <span className="w-5 h-5 bg-slate-200 rounded-full flex items-center justify-center text-[10px] font-bold text-slate-700 shrink-0 mt-0.5">3</span>
             <div>
-              <strong className="text-slate-800 font-semibold">Local High-Speed Embedding:</strong> Paragraf utuh dimasukkan ke dalam model <code className="bg-slate-200 px-1 py-0.2 rounded font-mono text-slate-700 font-bold">Xenova/all-MiniLM-L6-v2</code> pada server bertenaga CPU WebAssembly, memampukan pencarian semantik instan 100% gratis.
+              <strong className="text-slate-800 font-semibold">Cloud-Powered Gemini Embedding:</strong> Paragraf utuh dikonversi menjadi representasi vektor 768-dimensi secara real-time menggunakan model <code className="bg-slate-200 px-1 py-0.2 rounded font-mono text-slate-700 font-bold">gemini-embedding-2-preview</code> dari Google Cloud, memampukan pencarian kedekatan semantik (cosine similarity) berpresisi tinggi.
             </div>
           </li>
         </ul>
