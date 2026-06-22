@@ -20,7 +20,7 @@ export default function App() {
   const [isChatOpenMobile, setIsChatOpenMobile] = useState(false);
   const [vectorCount, setVectorCount] = useState(0);
 
-  // Check the backend server health on mount & check RAG index capacity
+  // Periksa kesehatan server backend saat dimuat & periksa kapasitas indeks RAG
   const checkHealth = async () => {
     try {
       const response = await fetch('/api/health');
@@ -38,7 +38,7 @@ export default function App() {
 
   useEffect(() => {
     checkHealth();
-    // Periodically sync vector store index size
+    // Sinkronkan ukuran indeks penyimpanan vektor secara berkala
     const interval = setInterval(checkHealth, 5000);
     return () => clearInterval(interval);
   }, []);
@@ -53,13 +53,13 @@ export default function App() {
 
   const handleSelectParagraphForChat = (text: string, chapterTitle: string, index: number) => {
     setSelectedParagraph({ text, chapterTitle, index });
-    setIsChatOpenMobile(true); // Auto expand chat drawer
+    setIsChatOpenMobile(true); // Buka drawer obrolan secara otomatis
   };
 
   return (
     <div className="h-screen max-h-screen bg-slate-50 flex flex-col font-sans text-slate-800 transition-colors duration-200 overflow-hidden">
       
-      {/* Header element */}
+      {/* Elemen Header */}
       <Header 
         activeTab={activeTab} 
         setActiveTab={setActiveTab} 
@@ -67,21 +67,21 @@ export default function App() {
         vectorCount={vectorCount}
       />
 
-      {/* Main Core View Area */}
+      {/* Area Tampilan Utama */}
       <main className="flex-1 flex flex-col min-h-0 relative overflow-hidden">
         
         {activeTab === 'reader' ? (
           
           !document ? (
-            // Upload area if no book is loaded
+            // Area unggah jika tidak ada buku yang dimuat
             <div className="flex-1 flex items-center justify-center">
               <UploadArea onUploadSuccess={handleUploadSuccess} />
             </div>
           ) : (
-            // Flex row containing ebook reader and chat sidebar
+            // Baris flex berisi pembaca ebook dan bilah sisi obrolan
             <div className="flex-1 flex flex-col md:flex-row overflow-hidden relative h-full min-h-0">
               
-              {/* eBook Reading frame */}
+              {/* Bingkai membaca eBook */}
               <div className="flex-grow md:flex-1 flex flex-col min-h-0">
                 <ReaderView 
                   document={document} 
@@ -91,7 +91,7 @@ export default function App() {
                 />
               </div>
 
-              {/* Backdrop overlay for mobile drawer */}
+              {/* Overlay latar belakang untuk drawer seluler/mobile */}
               {isChatOpenMobile && (
                 <div 
                   onClick={() => setIsChatOpenMobile(false)}
@@ -99,7 +99,7 @@ export default function App() {
                 />
               )}
 
-              {/* RAG chat drawer sidebar */}
+              {/* Bilah sisi drawer oborlan RAG */}
               <SidebarChat 
                 selectedParagraph={selectedParagraph}
                 onClearSelectedParagraph={() => setSelectedParagraph(null)}
@@ -107,7 +107,7 @@ export default function App() {
                 onCloseMobile={() => setIsChatOpenMobile(false)}
               />
 
-              {/* Floating Chat Trigger Button (Hides when drawer is open, accessible on all screen widths) */}
+              {/* Tombol Pemicu Obrolan Melayang (Sembunyi saat drawer terbuka, dapat diakses di semua lebar layar) */}
               {!isChatOpenMobile && (
                 <button
                   onClick={() => setIsChatOpenMobile(true)}
@@ -122,7 +122,7 @@ export default function App() {
           )
 
         ) : (
-          // Admin Evaluation view
+          // Tampilan Evaluasi Admin
           <AdminPanel />
         )}
 

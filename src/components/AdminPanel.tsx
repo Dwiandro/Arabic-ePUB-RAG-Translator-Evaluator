@@ -31,7 +31,7 @@ import {
 } from 'lucide-react';
 import { EvaluationResult, EvaluationSummary } from '../types';
 
-/// Pre-populated academic baseline demo data so the examiner sees beautiful charts immediately.
+/// Data demo garis dasar akademik yang diisi sebelumnya sehingga penguji dapat segera melihat grafik yang indah secara langsung.
 const INITIAL_DEMO_DATA: EvaluationSummary = {
   average_bleu: 0.8354,
   average_rouge: 0.8122,
@@ -123,12 +123,13 @@ export default function AdminPanel() {
   const [notification, setNotification] = useState<string | null>(null);
   const [progress, setProgress] = useState<{ current: number; total: number; message: string } | null>(null);
 
+  // 3. (EVALUASI_TERJEMAHAN) - Berlangganan SSE Stream Progress Evaluasi...
   const handleRunEvaluation = () => {
     setIsRunning(true);
     setNotification(null);
     setProgress({ current: 0, total: 5, message: "Menghubungkan ke server evaluasi..." });
 
-    // Open Server-Sent Events (SSE) connection cleanly to the GET endpoint
+    // Buka koneksi Server-Sent Events (SSE) secara bersih ke endpoint GET
     const eventSource = new EventSource("/api/evaluate");
 
     eventSource.onmessage = (event) => {
@@ -140,13 +141,13 @@ export default function AdminPanel() {
             total: data.total,
             message: data.message
           });
-          // Update evaluation live as we progress so the table populates in real time
+          // Perbarui evaluasi secara langsung seiring berjalannya proses agar tabel terisi secara real-time
           if (data.result) {
             setEvaluation(prev => {
               const cleanedResults = prev.results.filter(r => r.id !== data.result.id);
               const updatedResults = [...cleanedResults, data.result].sort((a, b) => a.id - b.id);
               
-              // Recalculate dynamic cumulative averages for progress indicators
+              // Hitung ulang rata-rata kumulatif dinamis untuk indikator kemajuan
               const sumB = updatedResults.reduce((acc, r) => acc + r.bleu_score, 0);
               const sumR = updatedResults.reduce((acc, r) => acc + r.rouge_score, 0);
               const sumS = updatedResults.reduce((acc, r) => acc + r.semantic_score, 0);
@@ -185,12 +186,13 @@ export default function AdminPanel() {
       eventSource.close();
     };
   };
+  // code *END 3. (EVALUASI_TERJEMAHAN)*
 
   const toggleRow = (id: number) => {
     setExpandedId(prev => (prev === id ? null : id));
   };
 
-  // Convert scores decimal to percentages for visualization
+  // Konversi skor desimal ke persentase untuk visualisasi
   const chartData = evaluation.results.map(r => ({
     name: `Kasus ${r.id}`,
     category: r.category,
@@ -202,7 +204,7 @@ export default function AdminPanel() {
   return (
     <div className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8 py-6 max-w-7xl mx-auto space-y-6">
       
-      {/* Intro academic block */}
+      {/* Blok akademik pengantar */}
       <div className="bg-slate-900 text-white rounded-3xl p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-6 shadow-lg border border-slate-850">
         <div className="space-y-2">
           <span className="inline-flex items-center gap-1.5 bg-amber-500/10 text-amber-400 font-bold px-3 py-1 rounded-full text-[10px] uppercase tracking-widest border border-amber-500/20">
@@ -241,10 +243,10 @@ export default function AdminPanel() {
         </div>
       )}
 
-      {/* SECTION 1: Macro Scorecards */}
+      {/* BAGIAN 1: Kartu Skor Makro */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
         
-        {/* BLEU Scorecard */}
+        {/* Kartu Skor BLEU */}
         <div className="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm space-y-4 relative overflow-hidden group hover:border-amber-400 transition duration-250">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
@@ -277,7 +279,7 @@ export default function AdminPanel() {
           </p>
         </div>
 
-        {/* ROUGE Scorecard */}
+        {/* Kartu Skor ROUGE */}
         <div className="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm space-y-4 relative overflow-hidden group hover:border-amber-400 transition duration-250">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
@@ -310,7 +312,7 @@ export default function AdminPanel() {
           </p>
         </div>
 
-        {/* Semantic Similarity Scorecard */}
+        {/* Kartu Skor Kesamaan Semantik */}
         <div className="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm space-y-4 relative overflow-hidden group hover:border-amber-400 transition duration-250">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
@@ -345,7 +347,7 @@ export default function AdminPanel() {
 
       </div>
 
-      {/* SECTION 2: Micro Bar Charts */}
+      {/* BAGIAN 2: Grafik Batang Mikro */}
       <div className="bg-white border border-slate-150 rounded-2xl p-5 shadow-sm space-y-3">
         <div className="space-y-0.5">
           <h3 className="text-sm font-bold text-slate-800 flex items-center gap-1.5">
@@ -357,7 +359,7 @@ export default function AdminPanel() {
           </p>
         </div>
 
-        {/* Recharts Container */}
+        {/* Wadah Recharts */}
         {isRunning ? (
           <div className="h-72 w-full flex flex-col items-center justify-center bg-slate-50 border border-dashed border-slate-250 rounded-2xl p-6 space-y-4">
             <div className="flex items-center gap-2.5">
@@ -422,7 +424,7 @@ export default function AdminPanel() {
         )}
       </div>
 
-      {/* SECTION 3: Detailed evaluation Table logs */}
+      {/* BAGIAN 3: Log Tabel Evaluasi Rinci */}
       <div className="bg-white border border-slate-150 rounded-2xl shadow-sm overflow-hidden min-w-full">
         <div className="p-5 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="space-y-0.5">
@@ -437,7 +439,7 @@ export default function AdminPanel() {
           </span>
         </div>
 
-        {/* Column Headers (Desktop Only) */}
+        {/* Header Kolom (Hanya Desktop) */}
         <div className="hidden md:grid md:grid-cols-12 gap-4 px-6 py-3 bg-slate-100/70 text-[10px] font-bold text-slate-500 uppercase tracking-wider border-b border-slate-150/60 select-none">
           <div className="col-span-6">Kasus Uji & Pertanyaan Evaluasi</div>
           <div className="col-span-1.5 text-center">BLEU (Translasi)</div>
@@ -446,19 +448,19 @@ export default function AdminPanel() {
           <div className="col-span-1.5 text-right">Aksi</div>
         </div>
 
-        {/* Table Body */}
+        {/* Badan Tabel */}
         <div className="divide-y divide-slate-100">
           {evaluation.results.map((res) => {
             const isExpanded = expandedId === res.id;
             return (
               <div key={res.id} className="transition duration-150">
                 
-                {/* Header row clicker */}
+                {/* Pembuka baris header */}
                 <div 
                   onClick={() => toggleRow(res.id)}
                   className="px-6 py-4 grid grid-cols-1 md:grid-cols-12 gap-3 md:gap-4 items-center text-xs cursor-pointer hover:bg-slate-50 select-none transition duration-150"
                 >
-                  {/* Case Info and Question */}
+                  {/* Informasi Kasus dan Pertanyaan */}
                   <div className="md:col-span-6 flex items-start gap-3">
                     <span className="w-6 h-6 rounded-md bg-amber-500/10 text-amber-600 font-bold flex items-center justify-center font-mono text-xs shrink-0 mt-0.5">
                       {res.id}
@@ -478,7 +480,7 @@ export default function AdminPanel() {
                     </div>
                   </div>
 
-                  {/* BLEU Score column */}
+                  {/* Kolom Skor BLEU */}
                   <div className="md:col-span-1.5 flex md:flex-col items-center justify-between md:justify-center gap-1 bg-slate-50/50 md:bg-transparent p-2 md:p-0 rounded-lg">
                     <span className="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">BLEU Score</span>
                     <span className="font-mono font-bold text-indigo-600 text-sm">
@@ -486,7 +488,7 @@ export default function AdminPanel() {
                     </span>
                   </div>
 
-                  {/* ROUGE Score column */}
+                  {/* Kolom Skor ROUGE */}
                   <div className="md:col-span-1.5 flex md:flex-col items-center justify-between md:justify-center gap-1 bg-slate-50/50 md:bg-transparent p-2 md:p-0 rounded-lg">
                     <span className="md:hidden text-[10px] font-bold text-slate-400 uppercase tracking-widest">ROUGE-L Score</span>
                     <span className="font-mono font-bold text-emerald-600 text-sm">
@@ -494,7 +496,7 @@ export default function AdminPanel() {
                     </span>
                   </div>
 
-                  {/* Semantic Score column */}
+                  {/* Kolom Skor Semantik */}
                   <div className="md:col-span-1.5 flex md:flex-col items-center justify-between md:justify-center gap-1 bg-slate-50/50 md:bg-transparent p-2 md:p-0 rounded-lg">
                     <span className="md:hidden text-[10px] font-bold text-slate-450 uppercase tracking-widest">Semantic Match</span>
                     <span className="font-mono font-bold text-amber-600 text-sm">
@@ -502,7 +504,7 @@ export default function AdminPanel() {
                     </span>
                   </div>
 
-                  {/* Toggle button column */}
+                  {/* Kolom tombol alih */}
                   <div className="md:col-span-1.5 flex items-center justify-end text-slate-400 gap-1.5">
                     <span className="text-[10px] text-slate-450 font-semibold md:inline hidden mr-1">
                       {isExpanded ? "Tutup" : "Analisis Detail"}
@@ -511,11 +513,11 @@ export default function AdminPanel() {
                   </div>
                 </div>
 
-                {/* Expanded metadata card */}
+                {/* Kartu metadata yang diperluas */}
                 {isExpanded && (
                   <div className="px-6 py-6 bg-slate-50/70 border-t border-slate-100 flex flex-col space-y-5 text-xs animate-fade-in divide-y divide-slate-150/40">
                     
-                    {/* Translation comparison */}
+                    {/* Perbandingan terjemahan */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-1">
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
@@ -530,7 +532,7 @@ export default function AdminPanel() {
                       </div>
                     </div>
 
-                    {/* Summarization comparison */}
+                    {/* Perbandingan penyimpulan/ringkasan */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5 pb-1 pt-4">
                       <div className="space-y-2">
                         <div className="flex justify-between items-center">
@@ -545,7 +547,7 @@ export default function AdminPanel() {
                       </div>
                     </div>
 
-                    {/* Q&A comparison */}
+                    {/* Perbandingan Tanya & Jawab */}
                     <div className="space-y-4 pt-4">
                       <div className="bg-amber-50/70 border border-amber-200 p-4 rounded-xl space-y-1 shadow-2xs">
                         <h6 className="font-bold text-amber-800 text-[10px] uppercase tracking-wider">Pertanyaan Uji Pemahaman & Konsistensi Semantik:</h6>

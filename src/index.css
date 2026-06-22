@@ -7,7 +7,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 }
 
-/* Custom Scrollbar Styles for elegant aesthetic */
+/* Gaya Scrollbar Kustom untuk estetika elegan */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -26,7 +26,7 @@
   background: rgba(156, 163, 175, 0.45);
 }
 
-/* Animations and custom layout parameters */
+/* Animasi dan parameter tata letak kustom */
 .arabic-rtl {
   direction: rtl;
   text-align: right;

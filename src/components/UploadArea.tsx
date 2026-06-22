@@ -47,7 +47,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
     };
   }, [isLoading]);
 
-  // Drag handlers
+  // Handler Drag-and-Drop
   const handleDrag = (e: React.DragEvent) => {
     e.preventDefault();
     e.stopPropagation();
@@ -58,6 +58,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
     }
   };
 
+  // 1. (EKSTRAKSI_EPUB) - Mulai Upload & Polling Progress ePUB Arab...
   const processFile = async (file: File) => {
     if (!file.name.endsWith('.epub')) {
       setError('Format file tidak sesuai. Sistem hanya mengevaluasi file berekstensi .epub');
@@ -70,7 +71,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
     try {
       const reader = new FileReader();
       
-      // Convert file to base64 string
+      // Mengonversi file ke string base64
       reader.onload = async () => {
         const base64String = (reader.result as string).split(',')[1];
         
@@ -110,6 +111,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
       setIsLoading(false);
     }
   };
+  // code *END 1. (EKSTRAKSI_EPUB)*
 
   const handleDrop = (e: React.DragEvent) => {
     e.preventDefault();
@@ -134,7 +136,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
   return (
     <div className="max-w-2xl mx-auto my-12 px-4">
       
-      {/* Upload Zone */}
+      {/* Area Unggah */}
       <div
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
@@ -173,7 +175,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
                     Menghasilkan Embedding: <span className="text-amber-600 font-mono text-base">{progress.current}</span> / <span className="text-slate-500 font-mono text-sm">{progress.total}</span> chunk
                   </p>
                   
-                  {/* Visual Progress Bar */}
+                  {/* Bilah Progres Visual */}
                   <div className="w-full bg-slate-100 rounded-full h-3 border border-slate-200/60 overflow-hidden relative shadow-xs">
                     <div 
                       className="bg-gradient-to-r from-amber-400 to-amber-500 h-full rounded-full transition-all duration-300 ease-out shadow-xs"
@@ -230,7 +232,7 @@ export default function UploadArea({ onUploadSuccess }: UploadAreaProps) {
         </div>
       )}
 
-      {/* Instructional info for final thesis presentation */}
+      {/* Info instruksional untuk presentasi tugas akhir */}
       <div className="mt-8 bg-slate-50 border border-slate-200/80 rounded-2xl p-5 space-y-3 shadow-xs">
         <h4 className="text-xs font-bold text-slate-800 uppercase tracking-widest flex items-center gap-1.5">
           <FileText className="w-4 h-4 text-slate-500" />

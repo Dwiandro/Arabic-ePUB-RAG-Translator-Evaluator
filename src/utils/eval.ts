@@ -4,12 +4,12 @@
  */
 
 /**
- * Utility functions for evaluating NLP outputs.
- * Calculates standard BLEU, ROUGE-L, and Cosine Similarity scores.
+ * Fungsi utilitas untuk mengevaluasi keluaran NLP.
+ * Menghitung skor standar BLEU, ROUGE-L, dan Kesamaan Kosinus (Cosine Similarity).
  */
 
 /**
- * Tokenizes a text into words (lowercased, removing punctuation)
+ * Memecah teks menjadi token kata (huruf kecil, menghapus tanda baca)
  */
 export function tokenize(text: string): string[] {
   return text
@@ -20,7 +20,7 @@ export function tokenize(text: string): string[] {
 }
 
 /**
- * Generates N-grams from a list of tokens
+ * Menghasilkan N-gram dari daftar token kata
  */
 function getNgrams(tokens: string[], n: number): string[] {
   const ngrams: string[] = [];
@@ -31,8 +31,8 @@ function getNgrams(tokens: string[], n: number): string[] {
 }
 
 /**
- * Calculates BLEU score (smooth unigram BLEU-1 and bigram BLEU-2)
- * Formula: BLEU = BP * exp(w1 * ln(p1) + w2 * ln(p2) ...)
+ * Menghitung skor BLEU (unigram halus BLEU-1 dan bigram BLEU-2)
+ * Rumus: BLEU = BP * exp(w1 * ln(p1) + w2 * ln(p2) ...)
  * BP (Brevity Penalty) = c > r ? 1 : exp(1 - r/c)
  */
 export function calculateBLEU(candidate: string, reference: string): number {
@@ -43,7 +43,7 @@ export function calculateBLEU(candidate: string, reference: string): number {
     return 0;
   }
 
-  // BLEU-1: Unigram Precision
+  // BLEU-1: Presisi Unigram
   const candUnigrams = getNgrams(candTokens, 1);
   const refUnigrams = getNgrams(refTokens, 1);
   const refUnigramCounts: Record<string, number> = {};
@@ -61,7 +61,7 @@ export function calculateBLEU(candidate: string, reference: string): number {
   }
   const p1 = matchedUnigrams / candUnigrams.length;
 
-  // BLEU-2: Bigram Precision (with smoothing fallback)
+  // BLEU-2: Presisi Bigram (dengan cadangan pelembutan)
   const candBigrams = getNgrams(candTokens, 2);
   const refBigrams = getNgrams(refTokens, 2);
   let p2 = 0;
@@ -82,31 +82,31 @@ export function calculateBLEU(candidate: string, reference: string): number {
     }
     p2 = matchedBigrams / candBigrams.length;
   } else {
-    // Smoothing fallback for short sentences
+    // Cadangan pelembutan (smoothing) untuk kalimat pendek
     p2 = p1 * 0.5;
   }
 
-  // Soft geometric mean (BLEU-1 and BLEU-2)
-  // Standard weight: w1 = 0.5, w2 = 0.5
-  // If p1 or p2 are 0, use tiny values for smoothing
+  // Rata-rata geometrik halus (BLEU-1 dan BLEU-2)
+  // Bobot standar: w1 = 0.5, w2 = 0.5
+  // Jika p1 atau p2 bernilai 0, gunakan nilai sangat kecil untuk pelembutan
   const smoothP1 = p1 || 0.0001;
   const smoothP2 = p2 || 0.0001;
   const geometricMean = Math.exp(0.5 * Math.log(smoothP1) + 0.5 * Math.log(smoothP2));
 
-  // Brevity Penalty (BP)
+  // Brevity Penalty (BP) - Penalti Kependekan
   const c = candTokens.length;
   const r = refTokens.length;
   const bp = c > r ? 1.0 : Math.exp(1.0 - r / c);
 
   const rawBLEU = bp * geometricMean;
 
-  // Clamp between 0.0 and 1.0
+  // Membatasi nilai di antara 0.0 dan 1.0
   return Math.max(0, Math.min(1.0, rawBLEU));
 }
 
 /**
- * Calculates ROUGE-L (LCS-based F-measure)
- * LCS is calculated via dynamic programming.
+ * Menghitung ROUGE-L (F-measure berbasis LCS/Longest Common Subsequence)
+ * LCS dihitung melalui pemrograman dinamis (Dynamic Programming).
  * Recall (Rlcs) = LCS(C,R) / m
  * Precision (Plcs) = LCS(C,R) / n
  * F1 = (2 * R * P) / (R + P)
@@ -122,7 +122,7 @@ export function calculateROUGEL(candidate: string, reference: string): number {
     return 0;
   }
 
-  // Dynamic Programming LCS
+  // Pemrograman Dinamis LCS
   const dp: number[][] = Array(n + 1)
     .fill(null)
     .map(() => Array(m + 1).fill(0));
@@ -151,8 +151,8 @@ export function calculateROUGEL(candidate: string, reference: string): number {
 }
 
 /**
- * Computes the cosine similarity between two dimensional vectors.
- * Metric = (A . B) / (||A|| * ||B||)
+ * Menghitung kesamaan kosinus (cosine similarity) antara dua vektor dimensi.
+ * Metrik = (A . B) / (||A|| * ||B||)
  */
 export function calculateCosineSimilarity(vecA: number[], vecB: number[]): number {
   if (vecA.length !== vecB.length || vecA.length === 0) {

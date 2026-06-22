@@ -18,7 +18,7 @@ export default function Header({ activeTab, setActiveTab, serverStatus, vectorCo
     <header className="bg-slate-900 border-b border-slate-800 text-white shadow-md sticky top-0 z-50 transition-all duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5 flex flex-col md:flex-row justify-between items-center gap-4">
         
-        {/* Title and Academic Branding */}
+        {/* Judul dan Branding Akademik */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 bg-amber-500 rounded-lg flex items-center justify-center text-slate-900 font-bold shadow-md shadow-amber-500/10">
             <Cpu className="w-5.5 h-5.5" />
@@ -33,7 +33,7 @@ export default function Header({ activeTab, setActiveTab, serverStatus, vectorCo
           </div>
         </div>
 
-        {/* Server Health Status Indicator */}
+        {/* Indikator Status Kesehatan Server */}
         <div className="flex items-center gap-3 bg-slate-800/40 border border-slate-700/50 px-3.5 py-1.5 rounded-full text-xs">
           <div className="flex items-center gap-1.5">
             <span className={`w-2 h-2 rounded-full ${
@@ -52,7 +52,7 @@ export default function Header({ activeTab, setActiveTab, serverStatus, vectorCo
           )}
         </div>
 
-        {/* Navigation Tabs */}
+        {/* Tab Navigasi */}
         <nav className="flex bg-slate-950 p-1 rounded-xl border border-slate-800/80">
           <button
             onClick={() => setActiveTab('reader')}

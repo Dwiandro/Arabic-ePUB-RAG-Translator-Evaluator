@@ -11,25 +11,25 @@ import { GoogleGenAI, Type } from "@google/genai";
 import AdmZip from "adm-zip";
 import * as cheerio from "cheerio";
 
-// Load environment variables
+// Memuat variabel lingkungan (env)
 import "dotenv/config";
 
-// Import types and math utilities
+// Mengimpor tipe data dan utilitas matematika
 import { 
   calculateBLEU, 
   calculateROUGEL, 
   calculateCosineSimilarity 
 } from "./src/utils/eval.js";
 
-// Express App Configuration
+// Konfigurasi Aplikasi Express
 const app = express();
 const PORT = Number(process.env.PORT) || 3000;
 
-// Set body parsers with generous limits to support robust Base64 ePUB uploads
+// Mengatur body parser dengan batas besar untuk mendukung upload file ePUB Base64 yang andal
 app.use(express.json({ limit: "50mb" }));
 app.use(express.urlencoded({ limit: "50mb", extended: true }));
 
-// Global In-Memory Vector Store for RAG
+// Penyimpanan Vektor In-Memory Global untuk RAG
 interface VectorItem {
   id: string;
   chunk: {
@@ -51,9 +51,9 @@ let uploadProgress = {
   fileName: ""
 };
 
-// Cloud-based Google GenAI gemini-embedding-2-preview integration
+// Integrasi cloud berbasis Google GenAI gemini-embedding-2-preview
 /**
- * Computes embedding vector (768-dim) for a single text using gemini-embedding-2-preview.
+ * Menghitung vektor embedding (768 dimensi) untuk satu teks menggunakan gemini-embedding-2-preview.
  */
 async function generateEmbedding(text: string): Promise<number[]> {
   const ai = getGeminiClient();
@@ -71,23 +71,23 @@ async function generateEmbedding(text: string): Promise<number[]> {
 }
 
 /**
- * Generates multiple embedding vectors (768-dim) for given texts.
- * To respect the APIs constraints and guarantee high precision, this helper processes
- * texts in sequential batches of individual requests, gracefully handling rates limits.
+ * Menghasilkan beberapa vektor embedding (768 dimensi) untuk teks yang diberikan.
+ * Untuk menghormati batasan API dan menjamin presisi tinggi, pembantu ini memproses
+ * teks dalam batch sekuensial dari permintaan individu secara aman untuk menghindari batasan laju (rate limit).
  */
 async function generateEmbeddings(texts: string[]): Promise<number[][]> {
   const results: number[][] = [];
   for (const text of texts) {
     const vector = await generateEmbedding(text);
     results.push(vector);
-    // Tiny sleep to guard standard model quotas
+    // Jeda sebentar untuk menjaga kuota model standar
     await new Promise((resolve) => setTimeout(resolve, 80));
   }
   return results;
 }
 
 /**
- * Lazy initialization helper for Gemini 3.5 Client
+ * Pembantu inisialisasi malas (lazy initialization) untuk Klien Gemini 3.5
  */
 function getGeminiClient() {
   const apiKey = process.env.GEMINI_API_KEY;
@@ -107,7 +107,7 @@ function getGeminiClient() {
 }
 
 /**
- * Solid utility with exponential backoff retry to handle Gemini API rate limits (HTTP 429) gracefully.
+ * Utilitas andal dengan percobaan ulang backoff eksponensial untuk menangani batasan laju api (rate limit) Gemini (HTTP 429) dengan anggun.
  */
 async function callGeminiWithRetry(
   aiCallFn: () => Promise<any>,
@@ -129,7 +129,7 @@ async function callGeminiWithRetry(
       if (isRateLimit && attempt < maxRetries) {
         console.warn(`[Gemini API Rate Limit 429] Attempt ${attempt}/${maxRetries} failed. Retrying in ${delay / 1000}s...`);
         await new Promise((resolve) => setTimeout(resolve, delay));
-        delay *= 2; // Exponential scale
+        delay *= 2; // Skala eksponensial
       } else {
         throw error;
       }
@@ -137,28 +137,29 @@ async function callGeminiWithRetry(
   }
 }
 
-// -------------------------------------------------------------------
+/// -------------------------------------------------------------------
 // API ENDPOINTS
 // -------------------------------------------------------------------
 
 /**
- * Health check route
+ * Rute pemeriksaan kesehatan (health check)
  */
 app.get("/api/health", (req, res) => {
   res.json({ status: "healthy", vectorStoreSize: vectorStore.length });
 });
 
 /**
- * Endpoint to retrieve ongoing upload, parse, and embedding progress.
+ * Endpoint untuk mengambil progres unggah, analisis, dan penyematan vektor (embedding) yang sedang berlangsung.
  */
 app.get("/api/upload-progress", (req, res) => {
   res.json(uploadProgress);
 });
 
 /**
- * 1. Upload & Parse Arabic ePUB File via Base64 JSON Payload.
- * Splitting text based strictly on intact paragraphs, cleaning noisy html, and populating RAG vector store.
+ * 1. Unggah & Analisis File ePUB Arab via Payload JSON Base64.
+ * Membagi teks berdasarkan paragraf utuh, membersihkan HTML yang bising, dan mengisi toko vektor RAG.
  */
+// 1. (EKSTRAKSI_EPUB) - Logic Parser ePUB, Ekstraksi Paragraf Arab, & Embedding (gemini-embedding-2-preview)
 app.post("/api/upload-epub", async (req, res) => {
   try {
     const { name, file } = req.body;
@@ -178,18 +179,18 @@ app.post("/api/upload-epub", async (req, res) => {
     const zip = new AdmZip(buffer);
     const zipEntries = zip.getEntries();
 
-    // Store raw chapters list
+    // Menyimpan daftar bab mentah
     const chapters: any[] = [];
     const arabicRegex = /[\u0600-\u06FF\u0750-\u077F]/;
 
-    // Filter and collect XHTML/HTML files
+    // Memfilter dan mengumpulkan file XHTML/HTML
     const xhtmlEntries = zipEntries.filter(entry => 
       entry.entryName.endsWith(".xhtml") || 
       entry.entryName.endsWith(".html") || 
       entry.entryName.endsWith(".htm")
     );
 
-    // Sort entries alphabetically or by path length if no formal spine is processed
+    // Mengurutkan entri berdasarkan alfabet jika tidak ada tulang belakang (spine) dokumen formal yang diproses
     xhtmlEntries.sort((a, b) => a.entryName.localeCompare(b.entryName));
 
     let globalParagraphIdx = 0;
@@ -199,24 +200,24 @@ app.post("/api/upload-epub", async (req, res) => {
       const htmlContent = entry.getData().toString("utf8");
       const $ = cheerio.load(htmlContent);
 
-      // Extract Chapter Title: search h1, h2, h3, title, or fallback to file name
+      // Ekstrak Judul Bab: cari h1, h2, h3, tag title, atau cadangan menggunakan nama file
       let chapterTitle = $("h1").first().text().trim() || 
                          $("h2").first().text().trim() || 
                          $("title").first().text().trim() || 
                          path.basename(entry.entryName, path.extname(entry.entryName));
 
-      // Standardize simple titles
+      // Menstandardisasi judul sederhana
       if (!chapterTitle || chapterTitle.length > 80) {
         chapterTitle = path.basename(entry.entryName, path.extname(entry.entryName));
       }
 
       const rawParagraphs: any[] = [];
       
-      // Parse strictly targeting <p> tags
+      // Menguraikan secara ketat menargetkan tag <p>
       $("p").each((pIndex, el) => {
         const pText = $(el).text().trim();
         
-        // Parsing Rules: Preserve all Arabic characters and diacritics, length > 5, Arabic content only.
+        // Aturan Penguraian: Pertahankan semua karakter Arab dan harakat, panjang > 5, hanya konten Arab.
         if (pText.length > 5 && arabicRegex.test(pText)) {
           globalParagraphIdx++;
           rawParagraphs.push({
@@ -224,7 +225,7 @@ app.post("/api/upload-epub", async (req, res) => {
             text: pText
           });
 
-          // Queue RAG chunks
+          // Mengantrekan chunk RAG
           documentChunks.push({
             id: `chunk-${entry.entryName.replace(/\//g, "-")}-p-${rawParagraphs.length}`,
             text: pText,
@@ -250,13 +251,13 @@ app.post("/api/upload-epub", async (req, res) => {
       });
     }
 
-    // Embed and index retrieved chunks asynchronously into memory vector store.
-    // To ensure extreme reliability, we process the chunks with granular individual error trapping 
-    // so that an API error on a single irregular chunk doesn't result in dropping any other chunks.
+    // Menyematkan (embedding) dan mengindeks chunk bab secara asinkron ke dalam memori toko vektor.
+    // Untuk memastikan keandalan ekstrim, kami memproses chunk dengan perangkap kesalahan individu yang granular
+    // sehingga kegagalan API pada satu chunk tidak menyebabkan semua chunk lainnya dibatalkan.
     console.log(`Generating embedding vectors for ${documentChunks.length} Arabic chunks with granular error handling...`);
     const tempStore: VectorItem[] = [];
-    const CONCURRENCY_LIMIT = 3; // Fully compliant with standard rate bounds and preserves system responsiveness
-
+    const CONCURRENCY_LIMIT = 3; // Sepenuhnya mematuhi batas laju standar dan menjaga responsivitas sistem
+    
     uploadProgress.total = documentChunks.length;
     uploadProgress.state = "embedding";
     uploadProgress.current = 0;
@@ -281,7 +282,7 @@ app.post("/api/upload-epub", async (req, res) => {
 
       const results = await Promise.all(promises);
 
-      // Securely accumulate all successfully completed embeddings
+      // Akumulasikan semua embedding yang berhasil diselesaikan dengan aman
       for (const res of results) {
         if (res) {
           tempStore.push(res);
@@ -290,13 +291,13 @@ app.post("/api/upload-epub", async (req, res) => {
 
       uploadProgress.current = Math.min(i + CONCURRENCY_LIMIT, documentChunks.length);
 
-      // Gentle rate-limiting protection delay between micro-batches to sustain steady API delivery
+      // Jeda jeda perlindungan batasan laju yang lembut di antara mikro-batch untuk mempertahankan pengiriman API yang stabil
       if (i + CONCURRENCY_LIMIT < documentChunks.length) {
         await new Promise((resolve) => setTimeout(resolve, 1000));
       }
     }
 
-    // Overwrite the vector store for the session
+    // Menimpa toko vektor untuk sesi ini
     vectorStore = tempStore;
     console.log(`Successfully parsed ePUB document and indexed ${vectorStore.length} chunks!`);
     
@@ -314,10 +315,11 @@ app.post("/api/upload-epub", async (req, res) => {
     res.status(500).json({ error: `Gagal memproses file ePUB: ${error instanceof Error ? error.message : String(error)}` });
   }
 });
+// code *END 1. (EKSTRAKSI_EPUB)*
 
 /**
- * 2. Translate Chapter dynamically paragraph-by-paragraph using Gemini 3.5.
- * Uses a single batch call with JSON schema output to guarantee aligned paragraph structures.
+ * 2. Terjemahkan Bab secara dinamis paragraf-demi-paragraf menggunakan Gemini 3.5.
+ * Menggunakan panggilan batch tunggal dengan output skema JSON untuk menjamin struktur paragraf yang selaras.
  */
 app.post("/api/translate-chapter", async (req, res) => {
   try {
@@ -331,7 +333,7 @@ app.post("/api/translate-chapter", async (req, res) => {
 
     console.log(`Batch translating chapter "${chapterTitle}" (${paragraphs.length} paragraphs)...`);
 
-    // Prepare JSON schema schema for the response
+    // Siapkan skema JSON untuk respons
     const prompt = `Terjemahkan daftar paragraf sastra Arab berikut ke dalam Bahasa Indonesia secara ekspresif, kontekstual, dan mengalir natural. Jangan menghilangkan makna harakat atau istilah khusus. Kembalikan HASIL TERJEMAHAN dalam format array JSON yang berisi string terjemahan secara berurutan persis sama dengan jumlah input (${arabicTexts.length} item).
 
 Input Paragraf Arab:
@@ -361,7 +363,7 @@ ${JSON.stringify(arabicTexts, null, 2)}`;
 
     const translatedArray = JSON.parse(outputText.trim());
     
-    // Mount translation back to paragraphs
+    // Pasang kembali hasil terjemahan ke paragraf yang sesuai
     const updatedParagraphs = paragraphs.map((p, idx) => ({
       ...p,
       translation: translatedArray[idx] || "Terjemahan gagal digenerate oleh AI."
@@ -379,9 +381,10 @@ ${JSON.stringify(arabicTexts, null, 2)}`;
 });
 
 /**
- * 3. RAG Q&A Chatbot Pipeline
- * Calculates query vector, matches top 3 elements, and fetches context response.
+ * 3. Saluran Chatbot Tanya Jawab RAG (RAG Q&A Chatbot Pipeline)
+ * Menghitung vektor kueri, mencocokkan 3 elemen teratas, dan mengambil respons berbasis konteks.
  */
+// 2. (RAG_CHATBOT) - Pipeline Pencarian Cosine Similarity & Generasi Respon Kontekstual Gemini
 app.post("/api/chat", async (req, res) => {
   try {
     const { query, history = [] } = req.body;
@@ -397,20 +400,20 @@ app.post("/api/chat", async (req, res) => {
 
     console.log(`Retrieving RAG context for question: "${query}"...`);
 
-    // 1. Generate query vector
+    // 1. Hasilkan vektor kueri
     const queryEmbedding = await generateEmbedding(query);
 
-    // 2. Cosine match with vector store elements
+    // 2. Pencocokan kesamaan kosinus (cosine similarity) dengan elemen toko vektor
     const scoredStore = vectorStore.map(item => ({
       ...item,
       score: calculateCosineSimilarity(queryEmbedding, item.embedding)
     }));
 
-    // Sort descending and query top_k = 3
+    // Urutkan menurun dan ambil top_k = 3
     scoredStore.sort((a, b) => b.score - a.score);
     const topK = scoredStore.slice(0, 3);
 
-    // Formulate Context Block
+    // Rumuskan Blok Konteks
     const contextBlock = topK.map((item, idx) => 
       `Sumber ${idx + 1}: [Bab: ${item.chunk.chapterTitle}, Paragraf ke-${item.chunk.paragraphIndex}]
 Teks Arab: ${item.chunk.text}`
@@ -418,13 +421,13 @@ Teks Arab: ${item.chunk.text}`
 
     console.log(`Top similar chunk scores:`, topK.map(t => t.score));
 
-    // 3. System Instructions
+    // 3. Instruksi Sistem
     const systemPrompt = `You are an expert assistant for analyzing Arabic literature. You must answer the user's question strictly based on the provided retrieved context. Do not hallucinate external information. If the context does not contain the answer, explicitly state that the information is not available in the text. You must respond in the EXACT same language that the user asks the question in (e.g., if asked in English, answer in English; if in Portuguese, answer in Portuguese; if in Indonesian, answer in Indonesian; if in Arabic, answer in Arabic, etc.).
 
 Berikut adalah referensi konteks sastra Arab yang relevan untuk menjawab pertanyaan:
 ${contextBlock}`;
 
-    // Map history to Google GenAI format (role 'user' or 'model')
+    // Petakan riwayat percakapan ke format Google GenAI (peran 'user' atau 'model')
     const contents: any[] = [];
     history.forEach((msg: any) => {
       contents.push({
@@ -433,7 +436,7 @@ ${contextBlock}`;
       });
     });
 
-    // Add current query
+    // Tambahkan kueri saat ini
     contents.push({
       role: "user",
       parts: [{ text: query }]
@@ -462,15 +465,17 @@ ${contextBlock}`;
     res.status(500).json({ error: `Gagal memproses RAG Q&A: ${error instanceof Error ? error.message : String(error)}` });
   }
 });
+// code *END 2. (RAG_CHATBOT)*
 
 /**
- * 4. Automated Evaluation Pipeline endpoint (Admin Dashboard)
- * Computes BLEU, ROUGE-L, and Semantic Similarity against ground-truth in eval_dataset.json.
- * Uses sequential processing with sleep intervals to perfectly bypass the 15 RPM rate limiting constraints.
- * Leverages Server-Sent Events (SSE) to stream live progress updates to the frontend dashboard.
+ * 4. Endpoint Saluran Evaluasi Otomatis (Dasbor Admin)
+ * Menghitung skor BLEU, ROUGE-L, dan Kesamaan Semantik terhadap data acuan asli (ground-truth) di eval_dataset.json.
+ * Menggunakan pemrosesan sekuensial dengan interval jeda untuk sepenuhnya memintas batasan laju panggilan 15 RPM.
+ * Memanfaatkan Server-Sent Events (SSE) untuk mengalirkan pembaruan progres langsung ke dasbor frontend.
  */
+// 3. (EVALUASI_TERJEMAHAN) - Logic Hitung BLEU, ROUGE-L, & Cosine Semantic Similarity via SSE
 app.get("/api/evaluate", async (req, res) => {
-  // Set headers for Server-Sent Events (SSE)
+  // Atur header untuk Server-Sent Events (SSE)
   res.setHeader("Content-Type", "text/event-stream");
   res.setHeader("Cache-Control", "no-cache");
   res.setHeader("Connection", "keep-alive");
@@ -499,7 +504,7 @@ app.get("/api/evaluate", async (req, res) => {
       const test = testCases[i];
       console.log(`Evaluating case ${i + 1}/${testCases.length} (ID: ${test.id})...`);
 
-      // Construct isolation prompt for single test case to achieve maximal prompt execution accuracy
+      // Susun prompt isolasi untuk satu kasus uji guna mencapai akurasi eksekusi prompt maksimal
       const evaluationPrompt = `You are an academic NLP evaluation engine for Arabic literature.
 We are analyzing this specific Arabic literary text:
 Original Arabic: "${test.original_arabic}"
@@ -517,7 +522,7 @@ You MUST reply with a JSON object following this exact schema:
   "system_answer": "string"
 }`;
 
-      // Hit Gemini API for this specific single test case
+      // Hubungi Gemini API untuk kasus uji spesifik tunggal ini
       const response = await callGeminiWithRetry(() => ai.models.generateContent({
         model: "gemini-3.5-flash",
         contents: evaluationPrompt,
@@ -546,13 +551,13 @@ You MUST reply with a JSON object following this exact schema:
       const systemSummary = (generated.system_summary || "").trim();
       const systemAnswer = (generated.system_answer || "").trim();
 
-      // Compute BLEU score
+      // Hitung skor BLEU
       const bleuScore = calculateBLEU(systemTranslation, test.referensi_translasi);
 
-      // Compute ROUGE-L score
+      // Hitung skor ROUGE-L
       const rougeScore = calculateROUGEL(systemSummary, test.referensi_ringkasan);
 
-      // Compute Semantic similarity using cloud-based text-embedding-004 vectors
+      // Hitung kesamaan Semantik menggunakan vektor cloud generator embedding
       let semanticScore = 0;
       try {
         const sysAnswerVec = await generateEmbedding(systemAnswer);
@@ -563,7 +568,7 @@ You MUST reply with a JSON object following this exact schema:
         semanticScore = calculateROUGEL(systemAnswer, test.referensi_jawaban);
       }
 
-      // Add to averages
+      // Tambahkan ke rata-rata
       sumBleu += bleuScore;
       sumRouge += rougeScore;
       sumSemantic += semanticScore;
@@ -588,7 +593,7 @@ You MUST reply with a JSON object following this exact schema:
 
       results.push(testResult);
 
-      // Stream the progress and the result of this completed test case back to client
+      // Alirkan progres dan hasil dari kasus uji yang selesai ini kembali ke klien
       res.write(`data: ${JSON.stringify({ 
         type: "progress", 
         current: i + 1, 
@@ -597,7 +602,7 @@ You MUST reply with a JSON object following this exact schema:
         result: testResult
       })}\n\n`);
 
-      // Gentle rate limit protection delay between items
+      // Jeda jeda perlindungan batasan laju yang lembut di antara item
       if (i < testCases.length - 1) {
         console.log(`Rate limit guard sleep: waiting 4000ms for next item...`);
         await sleep(4000);
@@ -627,14 +632,15 @@ You MUST reply with a JSON object following this exact schema:
     res.end();
   }
 });
+// code *END 3. (EVALUASI_TERJEMAHAN)*
 
 // -------------------------------------------------------------------
-// FRONTEND BUNDLE AND DEVELOPMENT ROUTING SETUP
+// PENYIAPAN FRONTEND BUNDLE DAN DETEKSI DRIVER DEVELOPMENT
 // -------------------------------------------------------------------
 
 async function startServer() {
   if (process.env.NODE_ENV !== "production") {
-    // Mount Vite development server middleware mode
+    // Pasang middleware server pengembangan Vite dalam mode middlewareMode
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
@@ -642,7 +648,7 @@ async function startServer() {
     app.use(vite.middlewares);
     console.log("Vite Development server initialized.");
   } else {
-    // Serve static files in production from 'dist' directory
+    // Sajikan file statis dalam produksi dari direktori 'dist'
     const distPath = path.join(process.cwd(), "dist");
     app.use(express.static(distPath));
     app.get("*", (req, res) => {

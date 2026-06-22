@@ -36,7 +36,7 @@ export default function SidebarChat({
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 
-  // Initialize with academic-themed system greeting
+  // Inisialisasi dengan salam sistem bertema akademik
   useEffect(() => {
     if (messages.length === 0) {
       setMessages([
@@ -50,25 +50,26 @@ export default function SidebarChat({
     }
   }, []);
 
-  // Sync scroll on new messages
+  // Sinkronkan gulir (scroll) pada pesan baru
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages, isLoading]);
 
-  // Handle selected paragraph injection
+  // Tangani injeksi paragraf terpilih
   useEffect(() => {
     if (selectedParagraph) {
       setInputValue(`Berdasarkan paragraf ${selectedParagraph.index} di bab "${selectedParagraph.chapterTitle}", jelaskan makna filosofis dan konteks sastrawi dari kalimat berikut: "${selectedParagraph.text}"`);
     }
   }, [selectedParagraph]);
 
+  // 2. (RAG_CHATBOT) - Mengirim Query Hubungan Semantik ke Chatbot...
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputValue.trim() || isLoading) return;
 
     const userText = inputValue;
     setInputValue('');
-    onClearSelectedParagraph(); // Consume paragraph reference
+    onClearSelectedParagraph(); // Konsumsi referensi paragraf
 
     const userMessage: ChatMessage = {
       id: `user-${Date.now()}`,
@@ -81,7 +82,7 @@ export default function SidebarChat({
     setIsLoading(true);
 
     try {
-      // Map previous messages to context history
+      // Petakan pesan sebelumnya ke riwayat konteks
       const historyPayload = messages.map(msg => ({
         role: msg.role,
         content: msg.content
@@ -124,6 +125,7 @@ export default function SidebarChat({
       setIsLoading(false);
     }
   };
+  // code *END 2. (RAG_CHATBOT)*
 
   const handleResetChat = () => {
     if (window.confirm('Hapus semua history percakapan RAG?')) {
@@ -146,7 +148,7 @@ export default function SidebarChat({
         : 'translate-x-full md:hidden'
     }`}>
       
-      {/* Sidebar Header */}
+      {/* Header Sidebar */}
       <div className="bg-slate-950 px-4 py-4 border-b border-slate-850 flex items-center justify-between text-white shadow-sm select-none shrink-0">
         <div className="flex items-center gap-3">
           <div className="w-8 h-8 rounded-lg bg-amber-500 flex items-center justify-center text-slate-900 shadow-md shadow-amber-500/20 shrink-0">
@@ -169,7 +171,7 @@ export default function SidebarChat({
             </button>
           )}
 
-          {/* SANGAT JELAS: Tombol Tutup/Kembali yang mencolok */}
+          {/* SANGAT JELAS: Tombol Tutup/Kembali yang mencokan */}
           <button
             onClick={onCloseMobile}
             className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 hover:bg-amber-400 text-slate-950 font-extrabold rounded-lg text-xs transition duration-150 active:scale-95 shrink-0 shadow-sm border border-amber-600/20 cursor-pointer"
@@ -181,7 +183,7 @@ export default function SidebarChat({
         </div>
       </div>
 
-      {/* Messages area */}
+      {/* Area Pesan */}
       <div 
         className="flex-1 overflow-y-auto px-4 py-6 space-y-4 bg-slate-950/20 text-slate-200 min-h-0 overscroll-contain scrollbar-thin"
         style={{ WebkitOverflowScrolling: 'touch' }}
@@ -193,7 +195,7 @@ export default function SidebarChat({
               msg.role === 'user' ? 'ml-auto items-end' : 'mr-auto items-start'
             }`}
           >
-            {/* Sender and Time Indicator */}
+            {/* Indikator Pengirim dan Waktu */}
             <div className="flex items-center gap-1 text-[10px] text-slate-500 font-medium">
               {msg.role === 'user' ? (
                 <>
@@ -209,16 +211,16 @@ export default function SidebarChat({
               <span className="font-mono text-[9px] text-slate-600 pl-1">({msg.timestamp})</span>
             </div>
 
-            {/* Bubble content */}
+            {/* Konten Gelembung Chat */}
             <div className={`p-3.5 rounded-2xl text-xs leading-relaxed font-sans shadow-sm whitespace-pre-wrap ${
               msg.role === 'user'
                 ? 'bg-amber-500 text-slate-950 font-semibold rounded-tr-none'
-                : 'bg-slate-800 text-slate-200 border border-slate-750 rounded-tl-none font-medium'
+                : 'bg-slate-800 text-slate-200 border border-slate-755 rounded-tl-none font-medium'
             }`}>
               {msg.content}
             </div>
 
-            {/* Cited Sources (RAG specific!) */}
+            {/* Sumber Rujukan (Spesifik RAG!) */}
             {msg.sources && msg.sources.length > 0 && (
               <div className="space-y-1.5 w-full mt-1">
                 <span className="text-[9px] font-bold text-amber-500/80 uppercase tracking-wider flex items-center gap-1">
@@ -262,7 +264,7 @@ export default function SidebarChat({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Selected Paragraph Focus Banner */}
+      {/* Banner Fokus Paragraf Terpilih */}
       {selectedParagraph && (
         <div className="bg-amber-500/5 border-t border-b border-amber-500/10 px-4 py-2.5 flex items-start gap-2 animate-fade-in select-none">
           <HelpCircle className="w-4 h-4 text-amber-500 mt-0.5 shrink-0" />
@@ -279,7 +281,7 @@ export default function SidebarChat({
         </div>
       )}
 
-      {/* Message input area */}
+      {/* Area Input Pesan */}
       <form onSubmit={handleSendMessage} className="p-4 bg-slate-950 border-t border-slate-850 flex gap-2">
         <input
           type="text"

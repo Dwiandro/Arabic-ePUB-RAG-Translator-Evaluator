@@ -12,10 +12,10 @@ export default defineConfig(() => {
       },
     },
     server: {
-      // HMR is disabled in AI Studio via DISABLE_HMR env var.
+      // HMR dinonaktifkan di AI Studio melalui variabel lingkungan DISABLE_HMR.
       // Do not modifyâfile watching is disabled to prevent flickering during agent edits.
       hmr: process.env.DISABLE_HMR !== 'true',
-      // Disable file watching when DISABLE_HMR is true to save CPU during agent edits.
+      // Nonaktifkan pemantauan berkas saat DISABLE_HMR bernilai true untuk menghemat daya CPU selama pengeditan agen.
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
     },
   };
